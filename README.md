@@ -12,11 +12,10 @@ components, such as year or month, from `Date` or `POSIXct` objects.
 
 ## Installation
 
-You can install the released version of timewarp from
-[CRAN](https://CRAN.R-project.org) with:
+You can install the dev version from GitHub with:
 
 ``` r
-install.packages("timewarp")
+devtools::install_github("DavisVaughan/timewarp")
 ```
 
 ## Example

@@ -24,10 +24,10 @@ The goal of timewarp is to be a fast extractor of individual date-time component
 
 ## Installation
 
-You can install the released version of timewarp from [CRAN](https://CRAN.R-project.org) with:
+You can install the dev version from GitHub with:
 
 ``` r
-install.packages("timewarp")
+devtools::install_github("DavisVaughan/timewarp")
 ```
 
 ## Example
