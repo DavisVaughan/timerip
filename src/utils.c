@@ -1,9 +1,5 @@
 #include "utils.h"
 
-inline void never_reached(const char* fn) {
-  Rf_error("Internal error in `%s()`: Reached the unreachable.", fn);
-}
-
 static enum timewarp_class_type warp_class_type_impl(SEXP klass);
 
 enum timewarp_class_type warp_class_type(SEXP x) {
@@ -54,6 +50,20 @@ static const char* class_type_as_str(enum timewarp_class_type type) {
 // [[ register() ]]
 SEXP timewarp_class_type(SEXP x) {
   return Rf_mkString(class_type_as_str(warp_class_type(x)));
+}
+
+// -----------------------------------------------------------------------------
+
+inline void never_reached(const char* fn) {
+  Rf_error("Internal error in `%s()`: Reached the unreachable.", fn);
+}
+
+SEXP r_maybe_duplicate(SEXP x) {
+  if (MAYBE_REFERENCED(x)) {
+    return Rf_shallow_duplicate(x);
+  } else {
+    return x;
+  }
 }
 
 // -----------------------------------------------------------------------------

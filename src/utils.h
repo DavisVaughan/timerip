@@ -4,6 +4,7 @@
 #include "timewarp.h"
 
 void never_reached(const char* fn) __attribute__((noreturn));
+SEXP r_maybe_duplicate(SEXP x);
 
 enum timewarp_class_type {
   timewarp_class_date,
