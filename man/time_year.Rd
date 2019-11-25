@@ -6,6 +6,24 @@
 \usage{
 time_year(x)
 }
+\arguments{
+\item{x}{\verb{<Date / POSIXct / POSIXlt>}
+
+The vector to extract the year from.}
+}
 \description{
-Extract the year from a date or datetime
+\code{time_year()} extracts the year from a date or datetime object.
+}
+\examples{
+x <- as.Date("2019-01-01")
+time_year(x)
+
+# Identical dates, but in different years
+a <- as.POSIXct("1969-12-31 19:00:00", tz = "America/New_York")
+b <- as.POSIXct("1970-01-01 00:00:00", tz = "UTC")
+
+identical(as.numeric(a), as.numeric(b))
+
+time_year(a)
+time_year(b)
 }
