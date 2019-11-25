@@ -3,7 +3,6 @@
 
 #define TIMEWARP_YEAR_OFFSET 1900
 
-// [[ register() ]]
 SEXP posixct_warp_year(SEXP x) {
   R_xlen_t size = Rf_xlength(x);
 
@@ -50,6 +49,7 @@ SEXP posixct_warp_year(SEXP x) {
   return out;
 }
 
+// [[ register() ]]
 SEXP warp_year(SEXP x) {
   switch (warp_class_type(x)) {
   case timewarp_class_posixct: return posixct_warp_year(x);
