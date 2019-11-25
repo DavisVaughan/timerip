@@ -1,6 +1,15 @@
 #include "utils.h"
 
+// -----------------------------------------------------------------------------
+
+enum timewarp_class_type time_class_type(SEXP x);
 static enum timewarp_class_type time_class_type_impl(SEXP klass);
+static const char* class_type_as_str(enum timewarp_class_type type);
+
+// [[ register() ]]
+SEXP timewarp_class_type(SEXP x) {
+  return Rf_mkString(class_type_as_str(time_class_type(x)));
+}
 
 enum timewarp_class_type time_class_type(SEXP x) {
   if (!OBJECT(x)) {
@@ -47,11 +56,6 @@ static const char* class_type_as_str(enum timewarp_class_type type) {
   never_reached("class_type_as_str");
 }
 
-// [[ register() ]]
-SEXP timewarp_class_type(SEXP x) {
-  return Rf_mkString(class_type_as_str(time_class_type(x)));
-}
-
 // -----------------------------------------------------------------------------
 
 inline void never_reached(const char* fn) {
@@ -68,50 +72,45 @@ SEXP r_maybe_duplicate(SEXP x) {
 
 // -----------------------------------------------------------------------------
 
-int is_utc(SEXP x, int* needs_tz_reset, char* old_system_tz) {
-  int n_prot = 0;
-  int utc = 0;
+// - Do a direct look up here as this does not otherwise work on Windows
+// - If a system time zone is set, make a copy to prevent overwriting it,
+static const char* tz_system_get() {
+  const char* tz = getenv("TZ");
 
-  const char* chr_tz;
+  // NULL pointer if TZ is not set
+  if (!tz) {
+    return "";
+  }
+
+  return tz;
+}
+
+const char* tz_get(SEXP x) {
   SEXP x_tzone = Rf_getAttrib(x, Rf_install("tzone"));
 
   if (x_tzone == R_NilValue) {
-    chr_tz = "";
-  } else {
-    if (TYPEOF(x_tzone) != STRSXP || Rf_length(x_tzone) != 1) {
-      Rf_errorcall(R_NilValue, "`tzone` attribute must be a string or `NULL`.");
-    }
-
-    chr_tz = CHAR(STRING_ELT(x_tzone, 0));
+    return tz_system_get();
   }
 
-  // Missing tzone
-  if(strlen(chr_tz) == 0) {
-    // Do a direct look up here as this does not otherwise work on Windows
-    char *chr_system_tz = getenv("TZ");
-
-    // If a system time zone is set, make a copy to prevent overwriting it
-    // by accident and then assign it to `chr_tzone`
-    if(chr_system_tz) {
-      x_tzone = PROTECT_N(Rf_mkString(chr_system_tz), &n_prot);
-      chr_tz = CHAR(STRING_ELT(x_tzone, 0));
-    }
+  if (TYPEOF(x_tzone) != STRSXP || Rf_length(x_tzone) != 1) {
+    Rf_errorcall(R_NilValue, "`tzone` attribute must be a string or `NULL`.");
   }
 
-  if(strcmp(chr_tz, "GMT") == 0 || strcmp(chr_tz, "UTC") == 0) {
-    utc = 1;
-  };
+  const char* tz = CHAR(STRING_ELT(x_tzone, 0));
 
-  if(!utc && strlen(chr_tz) > 0) {
-    *needs_tz_reset = set_tz(chr_tz, old_system_tz);
-  }
-  else {
-    // To get the system timezone recorded
-    R_tzsetwall();
+  if (strlen(tz) == 0) {
+    return tz_system_get();
   }
 
-  UNPROTECT(n_prot);
-  return utc;
+  return tz;
+}
+
+bool tz_is_utc(const char* tz) {
+  return strcmp(tz, "GMT") == 0 || strcmp(tz, "UTC") == 0;
+}
+
+int tz_needs_system_env_set(const char* tz, bool utc) {
+  return !utc && strlen(tz) > 0;
 }
 
 // -----------------------------------------------------------------------------

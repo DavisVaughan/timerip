@@ -3,6 +3,13 @@
 
 #include "timewarp.h"
 
+// -----------------------------------------------------------------------------
+
+#define TIMEWARP_YEAR_OFFSET 1900
+#define TIMEWARP_SECONDS_IN_DAY 86400
+
+// -----------------------------------------------------------------------------
+
 enum timewarp_class_type {
   timewarp_class_date,
   timewarp_class_posixct,
@@ -12,7 +19,11 @@ enum timewarp_class_type {
 
 enum timewarp_class_type time_class_type(SEXP x);
 
-int is_utc(SEXP x, int* needs_tz_reset, char* old_system_tz);
+// -----------------------------------------------------------------------------
+
+const char* tz_get(SEXP x);
+bool tz_is_utc(const char* tz);
+int tz_needs_system_env_set(const char* tz, bool utc);
 
 // -----------------------------------------------------------------------------
 

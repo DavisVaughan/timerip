@@ -1,8 +1,23 @@
 #include "timewarp.h"
 #include "utils.h"
 
-#define TIMEWARP_YEAR_OFFSET 1900
-#define TIMEWARP_SECONDS_IN_DAY 86400
+// -----------------------------------------------------------------------------
+
+static SEXP date_time_year(SEXP x);
+static SEXP posixct_time_year(SEXP x);
+static SEXP posixlt_time_year(SEXP x);
+
+// [[ register() ]]
+SEXP time_year(SEXP x) {
+  switch (time_class_type(x)) {
+  case timewarp_class_date: return date_time_year(x);
+  case timewarp_class_posixct: return posixct_time_year(x);
+  case timewarp_class_posixlt: return posixlt_time_year(x);
+  default: Rf_errorcall(R_NilValue, "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
+  }
+}
+
+// -----------------------------------------------------------------------------
 
 #define DATE_TIME_YEAR(CTYPE, CONST_DEREF) {                   \
   const CTYPE* p_x = CONST_DEREF(x);                           \
@@ -47,6 +62,8 @@ static SEXP date_time_year(SEXP x) {
   return out;
 }
 
+// -----------------------------------------------------------------------------
+
 static SEXP posixct_time_year(SEXP x) {
   R_xlen_t size = Rf_xlength(x);
 
@@ -55,9 +72,14 @@ static SEXP posixct_time_year(SEXP x) {
 
   double* p_x = REAL(x);
 
-  int needs_tz_reset = 0;
+  const char* tz = tz_get(x);
+  bool utc = tz_is_utc(tz);
+  int needs_system_tz_set = tz_needs_system_env_set(tz, utc);
   char old_system_tz[1001] = "";
-  bool utc = is_utc(x, &needs_tz_reset, old_system_tz);
+
+  if (needs_system_tz_set) {
+    needs_system_tz_set = set_tz(tz, old_system_tz);
+  }
 
   for(R_xlen_t i = 0; i < size; i++) {
     stm tm;
@@ -82,13 +104,15 @@ static SEXP posixct_time_year(SEXP x) {
     p_out[i] = p_tm->tm_year + TIMEWARP_YEAR_OFFSET;
   }
 
-  if(needs_tz_reset) {
+  if(needs_system_tz_set) {
     reset_tz(old_system_tz);
   }
 
   UNPROTECT(1);
   return out;
 }
+
+// -----------------------------------------------------------------------------
 
 // Rely on the warning in `?as.POSIXlt()` that the components of POSIXlt
 // objects are always in the correct order
@@ -111,16 +135,3 @@ static SEXP posixlt_time_year(SEXP x) {
   UNPROTECT(1);
   return out;
 }
-
-// [[ register() ]]
-SEXP time_year(SEXP x) {
-  switch (time_class_type(x)) {
-  case timewarp_class_date: return date_time_year(x);
-  case timewarp_class_posixct: return posixct_time_year(x);
-  case timewarp_class_posixlt: return posixlt_time_year(x);
-  default: Rf_errorcall(R_NilValue, "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
-  }
-}
-
-#undef TIMEWARP_YEAR_OFFSET
-#undef TIMEWARP_SECONDS_IN_DAY
