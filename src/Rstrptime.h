@@ -521,7 +521,10 @@ w_strptime_internal (wchar_t *rp, const wchar_t *fmt, stm *tm,
 	    }
 	    break;
 	case L'Z':
-	    error(_("use of %s for input is not supported"), "%Z");
+	    // start DV changes
+	    // error(_("use of %s for input is not supported"), "%Z");
+	    error("use of %s for input is not supported", "%Z");
+            // stop DV changes
 	    return NULL;
 	    break;
 	case L'E':
@@ -988,7 +991,10 @@ strptime_internal (const char *rp, const char *fmt, stm *tm,
 	    }
 	    break;
 	case 'Z':
-	    error(_("use of %s for input is not supported"), "%Z");
+            // start DV changes
+	    // error(_("use of %s for input is not supported"), "%Z");
+	    error("use of %s for input is not supported", "%Z");
+	    // stop DV changes
 	    return NULL;
 	    break;
 	case 'E':
@@ -1162,12 +1168,14 @@ strptime_internal (const char *rp, const char *fmt, stm *tm,
   if nl_langinfo() has wchar_t versions (some OSes do, some do not).
 */
 
-attribute_hidden
-void dt_invalidate_locale() // used in platform.c
-{
-    locale_strings_set = 0;
-    locale_w_strings_set = 0;
-}
+// start DV changes
+// attribute_hidden
+// void dt_invalidate_locale() // used in platform.c
+// {
+//     locale_strings_set = 0;
+//     locale_w_strings_set = 0;
+// }
+// stop DV changes
 
 /* use system stuct tm and strftime/wcstime here */
 static void get_locale_strings(void)

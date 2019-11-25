@@ -56,6 +56,14 @@ extern void R_tzsetwall(void);
 extern char *R_tzname[2];
 extern int_fast64_t R_timegm(stm*);
 
-extern size_t
-R_strftime(char * const s, const size_t maxsize, const char *const format,
-	   const stm *const t);
+// start DV changes
+stm * localtime0(const double *tp, const int local, stm *ltm);
+int set_tz(const char *tz, char *oldtz);
+void reset_tz(char *tz);
+// stop DV changes
+
+// start DV changes
+// extern size_t
+// R_strftime(char * const s, const size_t maxsize, const char *const format,
+// 	      const stm *const t);
+// stop DV changes
