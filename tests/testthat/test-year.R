@@ -1,3 +1,6 @@
+# ------------------------------------------------------------------------------
+# Date
+
 test_that("can extract the year from a Date", {
   x <- new_date(0)
   expect_identical(time_year(x), 1970L)
@@ -8,10 +11,21 @@ test_that("can extract the year from an integer Date", {
   expect_identical(time_year(x), 1970L)
 })
 
+test_that("can extract the year from a Date subclass", {
+  x <- structure(0, class = c("foo_date", "Date"))
+  expect_identical(time_year(x), 1970L)
+})
+
+# ------------------------------------------------------------------------------
+# POSIXlt
+
 test_that("can extract the year from a POSIXlt", {
   x <- as.POSIXlt(new_datetime_utc(0), tz = "UTC")
   expect_identical(time_year(x), 1970L)
 })
+
+# ------------------------------------------------------------------------------
+# POSIXct
 
 test_that("can extract the year from a POSIXct in UTC", {
   expect_identical(time_year(new_datetime_utc(0)), 1970L)
@@ -38,6 +52,9 @@ test_that("border times are handled correctly using system TZ", {
     1969L
   )
 })
+
+# ------------------------------------------------------------------------------
+# Misc
 
 test_that("error if not a recognized date type", {
   expect_error(time_year(1), regexp = "Unknown object")
