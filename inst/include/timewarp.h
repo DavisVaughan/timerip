@@ -4,7 +4,7 @@
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>
 
-SEXP (*warp_year)(SEXP);
+SEXP (*time_year)(SEXP);
 
 void timewarp_init_api();
 

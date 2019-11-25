@@ -4,7 +4,7 @@
 #define TIMEWARP_YEAR_OFFSET 1900
 #define TIMEWARP_SECONDS_IN_DAY 86400
 
-#define DATE_WARP_YEAR(CTYPE, CONST_DEREF) {                   \
+#define DATE_TIME_YEAR(CTYPE, CONST_DEREF) {                   \
   const CTYPE* p_x = CONST_DEREF(x);                           \
                                                                \
   for(R_xlen_t i = 0; i < size; i++) {                         \
@@ -31,15 +31,15 @@
   }                                                            \
 }
 
-static SEXP date_warp_year(SEXP x) {
+static SEXP date_time_year(SEXP x) {
   R_xlen_t size = Rf_xlength(x);
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
   int* p_out = INTEGER(out);
 
   switch (TYPEOF(x)) {
-  case INTSXP: DATE_WARP_YEAR(int, INTEGER_RO); break;
-  case REALSXP: DATE_WARP_YEAR(double, REAL_RO); break;
+  case INTSXP: DATE_TIME_YEAR(int, INTEGER_RO); break;
+  case REALSXP: DATE_TIME_YEAR(double, REAL_RO); break;
   default: Rf_errorcall(R_NilValue, "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 
@@ -47,7 +47,7 @@ static SEXP date_warp_year(SEXP x) {
   return out;
 }
 
-static SEXP posixct_warp_year(SEXP x) {
+static SEXP posixct_time_year(SEXP x) {
   R_xlen_t size = Rf_xlength(x);
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
@@ -92,7 +92,7 @@ static SEXP posixct_warp_year(SEXP x) {
 
 // Rely on the warning in `?as.POSIXlt()` that the components of POSIXlt
 // objects are always in the correct order
-static SEXP posixlt_warp_year(SEXP x) {
+static SEXP posixlt_time_year(SEXP x) {
   SEXP out = VECTOR_ELT(x, 5);
 
   if (TYPEOF(out) != INTSXP) {
@@ -113,12 +113,12 @@ static SEXP posixlt_warp_year(SEXP x) {
 }
 
 // [[ register() ]]
-SEXP warp_year(SEXP x) {
-  switch (warp_class_type(x)) {
-  case timewarp_class_date: return date_warp_year(x);
-  case timewarp_class_posixct: return posixct_warp_year(x);
-  case timewarp_class_posixlt: return posixlt_warp_year(x);
-  default: Rf_errorcall(R_NilValue, "Unknown date class with type, %s.", Rf_type2char(TYPEOF(x)));
+SEXP time_year(SEXP x) {
+  switch (time_class_type(x)) {
+  case timewarp_class_date: return date_time_year(x);
+  case timewarp_class_posixct: return posixct_time_year(x);
+  case timewarp_class_posixlt: return posixlt_time_year(x);
+  default: Rf_errorcall(R_NilValue, "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 

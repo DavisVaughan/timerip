@@ -1,20 +1,20 @@
 #include "utils.h"
 
-static enum timewarp_class_type warp_class_type_impl(SEXP klass);
+static enum timewarp_class_type time_class_type_impl(SEXP klass);
 
-enum timewarp_class_type warp_class_type(SEXP x) {
+enum timewarp_class_type time_class_type(SEXP x) {
   if (!OBJECT(x)) {
     return timewarp_class_unknown;
   }
 
   SEXP klass = PROTECT(Rf_getAttrib(x, R_ClassSymbol));
-  enum timewarp_class_type type = warp_class_type_impl(klass);
+  enum timewarp_class_type type = time_class_type_impl(klass);
 
   UNPROTECT(1);
   return type;
 }
 
-static enum timewarp_class_type warp_class_type_impl(SEXP klass) {
+static enum timewarp_class_type time_class_type_impl(SEXP klass) {
   int n = Rf_length(klass);
   SEXP const* p_klass = STRING_PTR(klass);
 
@@ -49,7 +49,7 @@ static const char* class_type_as_str(enum timewarp_class_type type) {
 
 // [[ register() ]]
 SEXP timewarp_class_type(SEXP x) {
-  return Rf_mkString(class_type_as_str(warp_class_type(x)));
+  return Rf_mkString(class_type_as_str(time_class_type(x)));
 }
 
 // -----------------------------------------------------------------------------

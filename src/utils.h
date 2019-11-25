@@ -10,7 +10,7 @@ enum timewarp_class_type {
   timewarp_class_unknown
 };
 
-enum timewarp_class_type warp_class_type(SEXP x);
+enum timewarp_class_type time_class_type(SEXP x);
 
 int is_utc(SEXP x, int* needs_tz_reset, char* old_system_tz);
 
