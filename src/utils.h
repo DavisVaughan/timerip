@@ -3,9 +3,6 @@
 
 #include "timewarp.h"
 
-void never_reached(const char* fn) __attribute__((noreturn));
-SEXP r_maybe_duplicate(SEXP x);
-
 enum timewarp_class_type {
   timewarp_class_date,
   timewarp_class_posixct,
@@ -16,5 +13,18 @@ enum timewarp_class_type {
 enum timewarp_class_type warp_class_type(SEXP x);
 
 int is_utc(SEXP x, int* needs_tz_reset, char* old_system_tz);
+
+// -----------------------------------------------------------------------------
+
+void never_reached(const char* fn) __attribute__((noreturn));
+
+SEXP r_maybe_duplicate(SEXP x);
+
+// -----------------------------------------------------------------------------
+
+extern SEXP strings_posixlt;
+extern SEXP strings_posixct;
+extern SEXP strings_posixt;
+extern SEXP strings_date;
 
 #endif

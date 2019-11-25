@@ -22,14 +22,14 @@ static enum timewarp_class_type warp_class_type_impl(SEXP klass) {
   SEXP butlast = *p_klass++;
   SEXP last = *p_klass++;
 
-  if (last == Rf_mkChar("Date")) {
+  if (last == strings_date) {
     return timewarp_class_date;
   }
 
-  if (last == Rf_mkChar("POSIXt")) {
-    if (butlast == Rf_mkChar("POSIXlt")) {
+  if (last == strings_posixt) {
+    if (butlast == strings_posixlt) {
       return timewarp_class_posixlt;
-    } else if (butlast == Rf_mkChar("POSIXct")) {
+    } else if (butlast == strings_posixct) {
       return timewarp_class_posixct;
     }
   }
@@ -112,4 +112,32 @@ int is_utc(SEXP x, int* needs_tz_reset, char* old_system_tz) {
 
   UNPROTECT(n_prot);
   return utc;
+}
+
+// -----------------------------------------------------------------------------
+
+SEXP strings = NULL;
+SEXP strings_posixlt = NULL;
+SEXP strings_posixct = NULL;
+SEXP strings_posixt = NULL;
+SEXP strings_date = NULL;
+
+// -----------------------------------------------------------------------------
+
+void timewarp_init_utils(SEXP ns) {
+  // Holds the CHARSXP objects because they can be garbage collected
+  strings = Rf_allocVector(STRSXP, 4);
+  R_PreserveObject(strings);
+
+  strings_posixlt = Rf_mkChar("POSIXlt");
+  SET_STRING_ELT(strings, 0, strings_posixlt);
+
+  strings_posixct = Rf_mkChar("POSIXct");
+  SET_STRING_ELT(strings, 1, strings_posixct);
+
+  strings_posixt = Rf_mkChar("POSIXt");
+  SET_STRING_ELT(strings, 2, strings_posixt);
+
+  strings_date = Rf_mkChar("Date");
+  SET_STRING_ELT(strings, 3, strings_date);
 }
