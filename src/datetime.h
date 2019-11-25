@@ -1,3 +1,7 @@
+// start DV changes
+#ifndef TIMEWARP_DATETIME_H
+#define TIMEWARP_DATETIME_H
+// stop DV changes
 /*
  *  R : A Computer Language for Statistical Data Analysis
  *  Copyright (C) 2000-2014  The R Core Team.
@@ -66,4 +70,8 @@ void reset_tz(char *tz);
 // extern size_t
 // R_strftime(char * const s, const size_t maxsize, const char *const format,
 // 	      const stm *const t);
+// stop DV changes
+
+// start DV changes
+#endif // TIMEWARP_DATETIME_H
 // stop DV changes
