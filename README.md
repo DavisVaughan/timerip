@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![R build
+status](https://github.com/DavisVaughan/timewarp/workflows/R-CMD-check/badge.svg)](https://github.com/DavisVaughan/timewarp)
 <!-- badges: end -->
 
 The goal of timewarp is to be a fast extractor of individual date-time
