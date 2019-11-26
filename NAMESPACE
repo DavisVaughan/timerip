@@ -2,6 +2,7 @@
 
 export(time_hour)
 export(time_mday)
+export(time_minute)
 export(time_month)
 export(time_second)
 export(time_year)
