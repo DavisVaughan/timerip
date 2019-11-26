@@ -6,6 +6,7 @@
 #'
 #'   The vector to extract the year from.
 #'
+#' @return An integer vector the same size as `x` containing the years.
 #' @export
 #' @examples
 #' x <- as.Date("2019-01-01")

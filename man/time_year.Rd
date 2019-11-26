@@ -11,6 +11,9 @@ time_year(x)
 
 The vector to extract the year from.}
 }
+\value{
+An integer vector the same size as \code{x} containing the years.
+}
 \description{
 \code{time_year()} extracts the year from a date or datetime object.
 }
