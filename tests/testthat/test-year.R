@@ -16,6 +16,21 @@ test_that("can extract the year from a Date subclass", {
   expect_identical(time_year(x), 1970L)
 })
 
+test_that("bad date types are handled correctly", {
+  x <- structure("x", class = "Date")
+  expect_error(time_year(x), "`Date` type character")
+})
+
+test_that("Inf dates are handled correctly", {
+  x <- structure(Inf, class = "Date")
+  expect_equal(time_year(x), NA_integer_)
+})
+
+test_that("NaN dates are handled correctly", {
+  x <- structure(NaN, class = "Date")
+  expect_equal(time_year(x), NA_integer_)
+})
+
 # ------------------------------------------------------------------------------
 # POSIXlt
 
@@ -51,6 +66,21 @@ test_that("border times are handled correctly using system TZ", {
     with_envvar(list(TZ = "America/New_York"), time_year(x)),
     1969L
   )
+})
+
+test_that("bad date types are handled correctly", {
+  x <- structure("x", class = c("POSIXct", "POSIXt"))
+  expect_error(time_year(x), "`POSIXct` type character")
+})
+
+test_that("Inf dates are handled correctly", {
+  x <- structure(Inf, class = c("POSIXct", "POSIXt"))
+  expect_equal(time_year(x), NA_integer_)
+})
+
+test_that("NaN dates are handled correctly", {
+  x <- structure(NaN, class = c("POSIXct", "POSIXt"))
+  expect_equal(time_year(x), NA_integer_)
 })
 
 # ------------------------------------------------------------------------------

@@ -62,15 +62,42 @@ static SEXP date_time_year(SEXP x) {
   return out;
 }
 
+#undef DATE_TIME_YEAR
+
 // -----------------------------------------------------------------------------
+
+#define POSIXCT_TIME_YEAR(CTYPE, CONST_DEREF) {                  \
+  const CTYPE* p_x = CONST_DEREF(x);                             \
+                                                                 \
+  for(R_xlen_t i = 0; i < size; i++) {                           \
+    stm tm;                                                      \
+    stm* p_tm = &tm;                                             \
+                                                                 \
+    double elt = p_x[i];                                         \
+                                                                 \
+    bool valid;                                                  \
+                                                                 \
+    if(R_FINITE(elt)) {                                          \
+      p_tm = localtime0(&elt, !utc, &tm);                        \
+      valid = (p_tm != NULL);                                    \
+    } else {                                                     \
+      valid = false;                                             \
+    };                                                           \
+                                                                 \
+    if (!valid) {                                                \
+      p_out[i] = NA_INTEGER;                                     \
+      continue;                                                  \
+    }                                                            \
+                                                                 \
+    p_out[i] = p_tm->tm_year + TIMEWARP_YEAR_OFFSET;             \
+  }                                                              \
+}
 
 static SEXP posixct_time_year(SEXP x) {
   R_xlen_t size = Rf_xlength(x);
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
   int* p_out = INTEGER(out);
-
-  double* p_x = REAL(x);
 
   const char* tz = tz_get(x);
   bool utc = tz_is_utc(tz);
@@ -81,27 +108,10 @@ static SEXP posixct_time_year(SEXP x) {
     needs_system_tz_set = set_tz(tz, old_system_tz);
   }
 
-  for(R_xlen_t i = 0; i < size; i++) {
-    stm tm;
-    stm* p_tm = &tm;
-
-    double elt = p_x[i];
-
-    bool valid;
-
-    if(R_FINITE(elt)) {
-      p_tm = localtime0(&elt, !utc, &tm);
-      valid = (p_tm != NULL);
-    } else {
-      valid = false;
-    };
-
-    if (!valid) {
-      p_out[i] = NA_INTEGER;
-      continue;
-    }
-
-    p_out[i] = p_tm->tm_year + TIMEWARP_YEAR_OFFSET;
+  switch (TYPEOF(x)) {
+  case INTSXP: POSIXCT_TIME_YEAR(int, INTEGER_RO); break;
+  case REALSXP: POSIXCT_TIME_YEAR(double, REAL_RO); break;
+  default: Rf_errorcall(R_NilValue, "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
   }
 
   if(needs_system_tz_set) {
@@ -111,6 +121,8 @@ static SEXP posixct_time_year(SEXP x) {
   UNPROTECT(1);
   return out;
 }
+
+#undef POSIXCT_TIME_YEAR
 
 // -----------------------------------------------------------------------------
 
