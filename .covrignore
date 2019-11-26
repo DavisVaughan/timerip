@@ -1,2 +1,7 @@
 R/deprec-*.R
 R/compat-*.R
+src/getTZinfo.c
+src/localtime.c
+src/tzfile.h
+src/datetime.c
+src/datetime.h
