@@ -89,7 +89,12 @@ known OS with 64-bit time_t and complete tables is Linux.
 // uses the system mktime
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(__APPLE__) || defined(__sun)
 #define USE_INTERNAL_MKTIME
-// Not on linux systems. These use the system mktime
+#endif
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+#define HAVE_PUTENV_UNSET2
+#else
+#define HAVE_UNSETENV
 #endif
 
 // Always define to ensure `n_leapseconds` is set
@@ -635,9 +640,15 @@ void reset_tz(char *tz)
 #ifdef HAVE_UNSETENV
 	unsetenv("TZ"); /* FreeBSD variants do not return a value */
 #elif defined(HAVE_PUTENV_UNSET)
-	if(putenv("TZ")) warning(_("problem with unsetting timezone"));
+	// start DV changes
+	// if(putenv("TZ")) warning(_("problem with unsetting timezone"));
+	if(putenv("TZ")) warning("problem with unsetting timezone");
+	// stop DV changes
 #elif defined(HAVE_PUTENV_UNSET2)
-	if(putenv("TZ=")) warning(_("problem with unsetting timezone"));
+	// start DV changes
+	// if(putenv("TZ=")) warning(_("problem with unsetting timezone"));
+	if(putenv("TZ=")) warning("problem with unsetting timezone");
+	// stop DV changes
 #endif
     }
     tzset();
