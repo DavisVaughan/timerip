@@ -84,9 +84,15 @@ known OS with 64-bit time_t and complete tables is Linux.
 */
 
 // start DV changes
-// Always use internal mktime and define leapseconds
-// so `n_leapseconds` gets defined
+// Always define `USE_INTERNAL_MKTIME` on Windows, Mac, and Solaris
+// where it is always set by default, but not on Linux which
+// uses the system mktime
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(__APPLE__) || defined(__sun)
 #define USE_INTERNAL_MKTIME
+// Not on linux systems. These use the system mktime
+#endif
+
+// Always define to ensure `n_leapseconds` is set
 #define HAVE_POSIX_LEAPSECONDS
 // stop DV changes
 
