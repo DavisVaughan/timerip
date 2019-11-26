@@ -266,19 +266,24 @@ static double mktime00 (stm *tm)
 }
 
 #ifdef USE_INTERNAL_MKTIME
-/* Interface to mktime or mktime00 */
-static double mktime0 (stm *tm, const int local)
-{
-    if(validate_tm(tm) < 0) {
-#ifdef EOVERFLOW
-	errno = EOVERFLOW;
-#else
-	errno = 79;
-#endif
-	return -1.;
-    }
-    return local ? R_mktime(tm) : mktime00(tm);
-}
+// start DV changes
+// (avoid unused function warning since we don't export do_asPOSIXct)
+
+// /* Interface to mktime or mktime00 */
+// static double mktime0 (stm *tm, const int local)
+// {
+//     if(validate_tm(tm) < 0) {
+// #ifdef EOVERFLOW
+// 	errno = EOVERFLOW;
+// #else
+// 	errno = 79;
+// #endif
+// 	return -1.;
+//     }
+//     return local ? R_mktime(tm) : mktime00(tm);
+// }
+
+// stop DV changes
 
 /* Interface to localtime_r or gmtime_r */
 // start DV changes
@@ -416,40 +421,45 @@ static double guess_offset (stm *tm)
     return offset;
 }
 
-/* Interface to mktime or mktime00 */
-static double mktime0 (stm *tm, const int local)
-{
-    double res;
-    Rboolean OK;
+// start DV changes
+// (avoid unused function warning since we don't export do_asPOSIXct)
 
-    if(validate_tm(tm) < 0) {
-#ifdef EOVERFLOW
-	errno = EOVERFLOW;
-#else
-	errno = 79;
-#endif
-	return -1.;
-    }
-    if(!local) return mktime00(tm);
+// /* Interface to mktime or mktime00 */
+// static double mktime0 (stm *tm, const int local)
+// {
+//     double res;
+//     Rboolean OK;
+//
+//     if(validate_tm(tm) < 0) {
+// #ifdef EOVERFLOW
+// 	errno = EOVERFLOW;
+// #else
+// 	errno = 79;
+// #endif
+// 	return -1.;
+//     }
+//     if(!local) return mktime00(tm);
+//
+// /* macOS 10.9 gives -1 for dates prior to 1902, and ignores DST after 2037 */
+// #ifdef HAVE_WORKING_64BIT_MKTIME
+//     if(sizeof(time_t) == 8)
+// 	OK = !have_broken_mktime() || tm->tm_year >= 70;
+//     else
+// #endif
+// 	OK = tm->tm_year < 138 && tm->tm_year >= (have_broken_mktime() ? 70 : 02);
+//     if(OK) {
+// 	res = (double) mktime(tm);
+// 	if (res == -1.) return res;
+// #ifndef HAVE_POSIX_LEAPSECONDS
+// 	for(int i = 0; i < n_leapseconds; i++)
+// 	    if(res > leapseconds[i]) res -= 1.0;
+// #endif
+// 	return res;
+// /* watch the side effect here: both calls alter their arg */
+//     } else return guess_offset(tm) + mktime00(tm);
+// }
 
-/* macOS 10.9 gives -1 for dates prior to 1902, and ignores DST after 2037 */
-#ifdef HAVE_WORKING_64BIT_MKTIME
-    if(sizeof(time_t) == 8)
-	OK = !have_broken_mktime() || tm->tm_year >= 70;
-    else
-#endif
-	OK = tm->tm_year < 138 && tm->tm_year >= (have_broken_mktime() ? 70 : 02);
-    if(OK) {
-	res = (double) mktime(tm);
-	if (res == -1.) return res;
-#ifndef HAVE_POSIX_LEAPSECONDS
-	for(int i = 0; i < n_leapseconds; i++)
-	    if(res > leapseconds[i]) res -= 1.0;
-#endif
-	return res;
-/* watch the side effect here: both calls alter their arg */
-    } else return guess_offset(tm) + mktime00(tm);
-}
+// stop DV changes
 
 /* Interface for localtime or gmtime or internal substitute */
 // start DV changes
@@ -631,50 +641,53 @@ void reset_tz(char *tz)
     tzset();
 }
 
-static void glibc_fix(stm *tm, int *invalid)
-{
-    /* set mon and mday which glibc does not always set.
-       Use current year/... if none has been specified.
-
-       Specifying mon but not mday nor yday is invalid.
-    */
-    time_t t = time(NULL);
-    stm *tm0;
-    int tmp;
-#ifndef HAVE_POSIX_LEAPSECONDS
-    t -= n_leapseconds;
-#endif
-#ifdef HAVE_LOCALTIME_R
-    stm tm2;
-    tm0 = localtime_r(&t, &tm2);
-#else
-    tm0 = localtime(&t);
-#endif
-    if(tm->tm_year == NA_INTEGER) tm->tm_year = tm0->tm_year;
-    if(tm->tm_mon != NA_INTEGER && tm->tm_mday != NA_INTEGER) return;
-    /* at least one of the month and the day of the month is missing */
-    if(tm->tm_yday != NA_INTEGER) {
-	/* since we have yday, let that take precedence over mon/mday */
-	int yday = tm->tm_yday, mon = 0;
-	while(yday >= (tmp = days_in_month[mon] +
-		      ((mon==1 && isleap(1900+tm->tm_year))? 1 : 0))) {
-	    yday -= tmp;
-	    mon++;
-	}
-	tm->tm_mon = mon;
-	tm->tm_mday = yday + 1;
-    } else {
-	if(tm->tm_mday == NA_INTEGER) {
-	    if(tm->tm_mon != NA_INTEGER) {
-		*invalid = 1;
-		return;
-	    } else tm->tm_mday = tm0->tm_mday;
-	}
-	if(tm->tm_mon == NA_INTEGER) tm->tm_mon = tm0->tm_mon;
-    }
-}
-
 // start DV changes
+//
+//
+// static void glibc_fix(stm *tm, int *invalid)
+// {
+//     /* set mon and mday which glibc does not always set.
+//        Use current year/... if none has been specified.
+//
+//        Specifying mon but not mday nor yday is invalid.
+//     */
+//     time_t t = time(NULL);
+//     stm *tm0;
+//     int tmp;
+// #ifndef HAVE_POSIX_LEAPSECONDS
+//     t -= n_leapseconds;
+// #endif
+// #ifdef HAVE_LOCALTIME_R
+//     stm tm2;
+//     tm0 = localtime_r(&t, &tm2);
+// #else
+//     tm0 = localtime(&t);
+// #endif
+//     if(tm->tm_year == NA_INTEGER) tm->tm_year = tm0->tm_year;
+//     if(tm->tm_mon != NA_INTEGER && tm->tm_mday != NA_INTEGER) return;
+//     /* at least one of the month and the day of the month is missing */
+//     if(tm->tm_yday != NA_INTEGER) {
+// 	/* since we have yday, let that take precedence over mon/mday */
+// 	int yday = tm->tm_yday, mon = 0;
+// 	while(yday >= (tmp = days_in_month[mon] +
+// 		      ((mon==1 && isleap(1900+tm->tm_year))? 1 : 0))) {
+// 	    yday -= tmp;
+// 	    mon++;
+// 	}
+// 	tm->tm_mon = mon;
+// 	tm->tm_mday = yday + 1;
+//     } else {
+// 	if(tm->tm_mday == NA_INTEGER) {
+// 	    if(tm->tm_mon != NA_INTEGER) {
+// 		*invalid = 1;
+// 		return;
+// 	    } else tm->tm_mday = tm0->tm_mday;
+// 	}
+// 	if(tm->tm_mon == NA_INTEGER) tm->tm_mon = tm0->tm_mon;
+//     }
+// }
+//
+//
 // static const char ltnames [][7] =
 // { "sec", "min", "hour", "mday", "mon", "year", "wday", "yday", "isdst",
 //   "zone",  "gmtoff"};

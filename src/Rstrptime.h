@@ -38,9 +38,19 @@
 #endif
 
 static int locale_strings_set = 0;
+// start DV changes
+// (avoid warnings about unused variables)
+#if defined(HAVE_WCSFTIME)
 static int locale_w_strings_set = 0;
+#endif
+// stop DV changes
 static void get_locale_strings(void);
+// start DV changes
+// (avoid warnings about unused variables)
+#if defined(HAVE_WCSFTIME)
 static void get_locale_w_strings(void);
+#endif
+// stop DV changes
 
 
 #ifdef HAVE_STRINGS_H
@@ -212,6 +222,10 @@ static int Rwcsncasecmp(const wchar_t *cs1, const wchar_t *s2)
     }
     return 0;
 }
+
+// start DV changes
+// (avoid unused function warnings)
+#if defined(HAVE_WCSTOD)
 
 #define w_match_string(cs1, s2) \
   (Rwcsncasecmp ((cs1), (s2)) ? 0 : ((s2) += wcslen (cs1), 1))
@@ -694,6 +708,8 @@ w_strptime_internal (wchar_t *rp, const wchar_t *fmt, stm *tm,
   return rp;
 }
 
+#endif // defined(HAVE_WCSTOD)
+// stop DV changes
 
 static char *
 strptime_internal (const char *rp, const char *fmt, stm *tm,
@@ -1258,28 +1274,32 @@ static void get_locale_w_strings(void)
 }
 #endif
 
+// start DV changes
+// (avoid unused function warnings)
 
-/* We only care if the result is null or not */
-static void *
-R_strptime (const char *buf, const char *format, stm *tm,
-	    double *psecs, int *poffset)
-{
-#if defined(HAVE_WCSTOD)
-    if(mbcslocale) {
-	wchar_t wbuf[1001], wfmt[1001]; size_t n;
-	n = mbstowcs(NULL, buf, 1000);
-	if(n > 1000) error(_("input string is too long"));
-	n = mbstowcs(wbuf, buf, 1000);
-	if(n == -1) error(_("invalid multibyte input string"));
+// /* We only care if the result is null or not */
+// static void *
+// R_strptime (const char *buf, const char *format, stm *tm,
+// 	    double *psecs, int *poffset)
+// {
+// #if defined(HAVE_WCSTOD)
+//     if(mbcslocale) {
+// 	wchar_t wbuf[1001], wfmt[1001]; size_t n;
+// 	n = mbstowcs(NULL, buf, 1000);
+// 	if(n > 1000) error(_("input string is too long"));
+// 	n = mbstowcs(wbuf, buf, 1000);
+// 	if(n == -1) error(_("invalid multibyte input string"));
+//
+// 	n = mbstowcs(NULL, format, 1000);
+// 	if(n > 1000) error(_("format string is too long"));
+// 	n = mbstowcs(wfmt, format, 1000);
+// 	if(n == -1) error(_("invalid multibyte format string"));
+// 	return (void *) w_strptime_internal (wbuf, wfmt, tm, psecs, poffset);
+//     } else
+// #endif
+//     {
+// 	return (void *) strptime_internal (buf, format, tm, psecs, poffset);
+//     }
+// }
 
-	n = mbstowcs(NULL, format, 1000);
-	if(n > 1000) error(_("format string is too long"));
-	n = mbstowcs(wfmt, format, 1000);
-	if(n == -1) error(_("invalid multibyte format string"));
-	return (void *) w_strptime_internal (wbuf, wfmt, tm, psecs, poffset);
-    } else
-#endif
-    {
-	return (void *) strptime_internal (buf, format, tm, psecs, poffset);
-    }
-}
+// stop DV changes
