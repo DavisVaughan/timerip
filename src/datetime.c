@@ -129,8 +129,10 @@ extern char *tzname[2];
 #include <Rinternals.h>
 // stop DV changes
 
+// start DV changes
 /* Substitute based on glibc code. */
-#include "Rstrptime.h"
+// #include "Rstrptime.h"
+// stop DV changes
 
 static const int days_in_month[12] =
 {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
