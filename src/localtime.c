@@ -371,6 +371,9 @@ differ_by_repeat(const time_t t1, const time_t t0)
     return (int_fast64_t)t1 - (int_fast64_t)t0 == SECSPERREPEAT;
 }
 
+// start DV changes
+// NOTE: `getTZinfo` is defined in `getTZinfo.c`
+// stop DV changes
 extern const char *getTZinfo(void);
 extern void Rf_warning(const char *, ...);
 
