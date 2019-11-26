@@ -30,7 +30,7 @@ void R_init_timewarp(DllInfo *dll)
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
 
-  R_RegisterCCallable("timewarp", "warp_year", (DL_FUNC) &time_year);
+  R_RegisterCCallable("timewarp", "time_year", (DL_FUNC) &time_year);
 }
 
 void timewarp_init_utils(SEXP ns);
