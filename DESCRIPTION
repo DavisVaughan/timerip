@@ -1,13 +1,14 @@
 Package: timewarp
-Title: What the Package Does (One Line, Title Case)
+Title: Extract Datetime Components
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Davis",
            family = "Vaughan",
            role = c("aut", "cre"),
-           email = "davis@rstudio.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+           email = "davis@rstudio.com")
+Description: Extract datetime components easily and efficiently. The R Core
+    group is the original author of the code made available with slight
+    modifications by this package.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
