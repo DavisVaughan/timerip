@@ -141,8 +141,8 @@ static SEXP posixlt_time_year(SEXP x) {
 
   R_xlen_t size = Rf_xlength(out);
 
-  for (R_xlen_t i = 0; i < size; ++i, ++p_out) {
-    *p_out += TIMEWARP_YEAR_OFFSET;
+  for (R_xlen_t i = 0; i < size; ++i) {
+    p_out[i] += TIMEWARP_YEAR_OFFSET;
   }
 
   UNPROTECT(1);
