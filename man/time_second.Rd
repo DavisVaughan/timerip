@@ -12,7 +12,7 @@ time_second(x)
 The vector to extract the seconds from.}
 }
 \value{
-An integer vector the same size as \code{x} containing the seconds.
+A double vector the same size as \code{x} containing the seconds.
 }
 \description{
 \code{time_second()} extracts the seconds from a date or datetime object.

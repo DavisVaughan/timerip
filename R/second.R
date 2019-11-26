@@ -6,7 +6,7 @@
 #'
 #'   The vector to extract the seconds from.
 #'
-#' @return An integer vector the same size as `x` containing the seconds.
+#' @return A double vector the same size as `x` containing the seconds.
 #' @export
 #' @examples
 #' x <- as.POSIXct("2019-01-01 00:00:05", "UTC")
