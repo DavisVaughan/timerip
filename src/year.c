@@ -80,15 +80,6 @@ static SEXP posixct_time_year(SEXP x) {
   if (needs_system_tz_set) {
     needs_system_tz_set = set_tz(tz, old_system_tz);
   }
-#ifdef USE_INTERNAL_MKTIME // In `datetime.c`
-  else {
-    R_tzsetwall(); // to get the system timezone recorded
-  }
-#else
-  else {
-    tzset();
-  }
-#endif
 
   for(R_xlen_t i = 0; i < size; i++) {
     stm tm;
