@@ -4,9 +4,11 @@
 \name{timewarp-package}
 \alias{timewarp}
 \alias{timewarp-package}
-\title{timewarp: What the Package Does (One Line, Title Case)}
+\title{timewarp: Extract Datetime Components}
 \description{
-What the package does (one paragraph).
+Extract datetime components easily and efficiently. The R Core
+    group is the original author of the code made available with slight
+    modifications by this package.
 }
 \seealso{
 Useful links:
@@ -17,7 +19,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Davis Vaughan \email{davis@rstudio.com}
 
 }
 \keyword{internal}
