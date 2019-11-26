@@ -23,12 +23,12 @@ test_that("bad date types are handled correctly", {
 
 test_that("Inf dates are handled correctly", {
   x <- structure(Inf, class = "Date")
-  expect_equal(time_year(x), NA_integer_)
+  expect_identical(time_year(x), NA_integer_)
 })
 
 test_that("NaN dates are handled correctly", {
   x <- structure(NaN, class = "Date")
-  expect_equal(time_year(x), NA_integer_)
+  expect_identical(time_year(x), NA_integer_)
 })
 
 # ------------------------------------------------------------------------------
@@ -75,12 +75,12 @@ test_that("bad date types are handled correctly", {
 
 test_that("Inf dates are handled correctly", {
   x <- structure(Inf, class = c("POSIXct", "POSIXt"))
-  expect_equal(time_year(x), NA_integer_)
+  expect_identical(time_year(x), NA_integer_)
 })
 
 test_that("NaN dates are handled correctly", {
   x <- structure(NaN, class = c("POSIXct", "POSIXt"))
-  expect_equal(time_year(x), NA_integer_)
+  expect_identical(time_year(x), NA_integer_)
 })
 
 # ------------------------------------------------------------------------------
