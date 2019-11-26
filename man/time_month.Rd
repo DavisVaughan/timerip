@@ -9,7 +9,7 @@ time_month(x)
 \arguments{
 \item{x}{\verb{<Date / POSIXct / POSIXlt>}
 
-The vector to extract the year from.}
+The vector to extract the month from.}
 }
 \value{
 An integer vector the same size as \code{x} containing the months. \code{1}

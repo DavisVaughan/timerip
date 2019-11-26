@@ -4,7 +4,7 @@
 #'
 #' @param x `<Date / POSIXct / POSIXlt>`
 #'
-#'   The vector to extract the year from.
+#'   The vector to extract the month from.
 #'
 #' @return An integer vector the same size as `x` containing the months. `1`
 #'   aligns with January, and `12` is December.
