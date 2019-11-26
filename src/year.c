@@ -117,10 +117,11 @@ static SEXP posixct_time_year(SEXP x) {
 // Rely on the warning in `?as.POSIXlt()` that the components of POSIXlt
 // objects are always in the correct order
 static SEXP posixlt_time_year(SEXP x) {
-  SEXP out = VECTOR_ELT(x, 5);
+  int pos = 5;
+  SEXP out = VECTOR_ELT(x, pos);
 
   if (TYPEOF(out) != INTSXP) {
-    Rf_errorcall(R_NilValue, "The 6th element of `x` must be an integer vector.");
+    Rf_errorcall(R_NilValue, "The %ith element of `x` must be an integer vector.", pos + 1);
   }
 
   out = PROTECT(r_maybe_duplicate(out));
