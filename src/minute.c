@@ -22,12 +22,12 @@ SEXP time_minute(SEXP x) {
 // After conversation with Hadley, assume that a Date should not be allowed to
 // have fractional pieces, like seconds. Always return 0 or NA.
 
-#define DATE_TIME_MINUTE(CTYPE, CONST_DEREF) {                   \
-const CTYPE* p_x = CONST_DEREF(x);                               \
-                                                                 \
-for(R_xlen_t i = 0; i < size; i++) {                             \
-  p_out[i] = R_FINITE(p_x[i]) ? 0 : NA_INTEGER;                  \
-}                                                                \
+#define DATE_TIME_MINUTE(CTYPE, CONST_DEREF) {                     \
+  const CTYPE* p_x = CONST_DEREF(x);                               \
+                                                                   \
+  for(R_xlen_t i = 0; i < size; i++) {                             \
+    p_out[i] = R_FINITE(p_x[i]) ? 0 : NA_INTEGER;                  \
+  }                                                                \
 }
 
 static SEXP date_time_minute(SEXP x) {
@@ -50,31 +50,31 @@ static SEXP date_time_minute(SEXP x) {
 
 // -----------------------------------------------------------------------------
 
-#define POSIXCT_TIME_MINUTE(CTYPE, CONST_DEREF) {    \
-const CTYPE* p_x = CONST_DEREF(x);                   \
-                                                     \
-for(R_xlen_t i = 0; i < size; i++) {                 \
-  stm tm;                                            \
-  stm* p_tm = &tm;                                   \
-                                                     \
-  double elt = p_x[i];                               \
-                                                     \
-  bool valid;                                        \
-                                                     \
-  if(R_FINITE(elt)) {                                \
-    p_tm = localtime0(&elt, !utc, &tm);              \
-    valid = (p_tm != NULL);                          \
-  } else {                                           \
-    valid = false;                                   \
-  };                                                 \
-                                                     \
-  if (!valid) {                                      \
-    p_out[i] = NA_REAL;                              \
-    continue;                                        \
-  }                                                  \
-                                                     \
-  p_out[i] = p_tm->tm_min;                           \
-}                                                    \
+#define POSIXCT_TIME_MINUTE(CTYPE, CONST_DEREF) {      \
+  const CTYPE* p_x = CONST_DEREF(x);                   \
+                                                       \
+  for(R_xlen_t i = 0; i < size; i++) {                 \
+    stm tm;                                            \
+    stm* p_tm = &tm;                                   \
+                                                       \
+    double elt = p_x[i];                               \
+                                                       \
+    bool valid;                                        \
+                                                       \
+    if(R_FINITE(elt)) {                                \
+      p_tm = localtime0(&elt, !utc, &tm);              \
+      valid = (p_tm != NULL);                          \
+    } else {                                           \
+      valid = false;                                   \
+    };                                                 \
+                                                       \
+    if (!valid) {                                      \
+      p_out[i] = NA_REAL;                              \
+      continue;                                        \
+    }                                                  \
+                                                       \
+    p_out[i] = p_tm->tm_min;                           \
+  }                                                    \
 }
 
 static SEXP posixct_time_minute(SEXP x) {
