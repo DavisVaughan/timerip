@@ -10,6 +10,7 @@ extern SEXP time_second(SEXP x);
 extern SEXP time_minute(SEXP x);
 extern SEXP time_hour(SEXP x);
 extern SEXP time_mday(SEXP x);
+extern SEXP time_wday(SEXP x);
 extern SEXP timewarp_class_type(SEXP x);
 
 // Defined below
@@ -22,6 +23,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"timewarp_minute",       (DL_FUNC) &time_minute, 1},
   {"timewarp_hour",         (DL_FUNC) &time_hour, 1},
   {"timewarp_mday",         (DL_FUNC) &time_mday, 1},
+  {"timewarp_wday",         (DL_FUNC) &time_wday, 1},
   {"timewarp_class_type",   (DL_FUNC) &timewarp_class_type, 1},
   {"timewarp_init_library", (DL_FUNC) &timewarp_init_library, 1},
   {NULL, NULL, 0}
