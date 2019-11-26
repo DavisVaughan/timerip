@@ -85,7 +85,9 @@ static SEXP posixct_time_year(SEXP x) {
     R_tzsetwall(); // to get the system timezone recorded
   }
 #else
-  tzset();
+  else {
+    tzset();
+  }
 #endif
 
   for(R_xlen_t i = 0; i < size; i++) {
