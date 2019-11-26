@@ -28,12 +28,12 @@ test_that("bad date types are handled correctly", {
 
 test_that("Inf dates are handled correctly", {
   x <- structure(Inf, class = "Date")
-  expect_identical(time_second(x), NA_integer_)
+  expect_identical(time_second(x), NA_real_)
 })
 
 test_that("NaN dates are handled correctly", {
   x <- structure(NaN, class = "Date")
-  expect_identical(time_second(x), NA_integer_)
+  expect_identical(time_second(x), NA_real_)
 })
 
 # ------------------------------------------------------------------------------
