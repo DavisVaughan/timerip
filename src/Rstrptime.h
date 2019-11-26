@@ -94,10 +94,15 @@ static void get_locale_w_strings(void);
   } while (0)
 # define get_alt_number(from, to, n) \
   /* We don't have the alternate representation.  */			      \
-  get_number(from, to, n)
-#define recursive(new_fmt) \
-  (*(new_fmt) != '\0'							      \
-   && (rp = strptime_internal (rp, (new_fmt), tm, psecs, poffset)) != NULL)
+  get_number(from, to, n)                                      \
+// start DV changes
+// (avoid unused function warnings because strptime_internal() is not required)
+//
+// #define recursive(new_fmt) \
+//   (*(new_fmt) != '\0'							      \
+//    && (rp = strptime_internal (rp, (new_fmt), tm, psecs, poffset)) != NULL)
+//
+// stop DV changes
 
 /* This version: may overwrite these with versions for the locale,
  * hence the extra length of the fields.
@@ -189,6 +194,10 @@ day_of_the_year (stm *tm)
 #include <wchar.h>
 #include <wctype.h>
 
+// start DV changes
+// (avoid unused function warnings)
+#if defined(HAVE_WCSTOD)
+
 #define DT_WBUFSIZE 25
 static wchar_t w_weekday_name[][DT_WBUFSIZE] =
 {
@@ -222,10 +231,6 @@ static int Rwcsncasecmp(const wchar_t *cs1, const wchar_t *s2)
     }
     return 0;
 }
-
-// start DV changes
-// (avoid unused function warnings)
-#if defined(HAVE_WCSTOD)
 
 #define w_match_string(cs1, s2) \
   (Rwcsncasecmp ((cs1), (s2)) ? 0 : ((s2) += wcslen (cs1), 1))
@@ -711,472 +716,477 @@ w_strptime_internal (wchar_t *rp, const wchar_t *fmt, stm *tm,
 #endif // defined(HAVE_WCSTOD)
 // stop DV changes
 
-static char *
-strptime_internal (const char *rp, const char *fmt, stm *tm,
-		   double *psecs, int *poffset)
-{
-    int cnt;
-    int val;
-    int have_I, is_pm;
-    int century, want_century;
-    int have_wday, want_xday;
-    int have_yday;
-    int have_mon, have_mday;
-    int have_uweek, have_wweek;
-    int week_no = 0; /* -Wall */
-
-    have_I = is_pm = 0;
-    century = -1;
-    want_century = 0;
-    have_wday = want_xday = have_yday = have_mon = have_mday = 0;
-    have_uweek = have_wweek = 0;
-
-    while (*fmt != '\0')
-    {
-	/* A white space in the format string matches 0 more or white
-	   space in the input string.  */
-	if (isspace ((int)*fmt))
-	{
-	    while (isspace ((int)*rp))
-		++rp;
-	    ++fmt;
-	    continue;
-	}
-
-	/* Any character but `%' must be matched by the same character
-	   in the input string.  */
-	if (*fmt != '%')
-	{
-	    match_char (*fmt++, *rp++);
-	    continue;
-	}
-
-	++fmt;
-
-	/* We need this for handling the `E' modifier.  */
-    start_over:
-
-	switch (*fmt++)
-	{
-	case '%':
-	    /* Match the `%' character itself.  */
-	    match_char ('%', *rp++);
-	    break;
-	case 'a':
-	case 'A':
-	    /* Match day of week.  */
-	    if(!locale_strings_set) get_locale_strings();
-	    /* try full name first */
-	    for (cnt = 0; cnt < 7; ++cnt)
-		if  (match_string (weekday_name[cnt], rp)) break;
-	    if (cnt == 7) {
-		for (cnt = 0; cnt < 7; ++cnt)
-		    if (match_string (ab_weekday_name[cnt], rp)) break;
-	    }
-	    if (cnt == 7)
-		/* Does not match a weekday name.  */
-		return NULL;
-	    tm->tm_wday = cnt;
-	    have_wday = 1;
-	    break;
-	case 'b':
-	case 'B':
-	case 'h':
-	    /* Match month name.  */
-	    if(!locale_strings_set) get_locale_strings();
-	    /* try full name first */
-	    for (cnt = 0; cnt < 12; ++cnt)
-		if (match_string (month_name[cnt], rp)) break;
-	    if (cnt == 12) {
-		/* Try full names */
-		for (cnt = 0; cnt < 12; ++cnt)
-		    if (match_string (ab_month_name[cnt], rp)) break;
-	    }
-	    if (cnt == 12)
-		/* Does not match a month name.  */
-		return NULL;
-	    tm->tm_mon = cnt;
-	    want_xday = 1;
-	    break;
-	case 'c':
-	    /* Match locale's date and time format.  */
-	    if (!recursive (HERE_D_T_FMT))
-		return NULL;
-	    break;
-	case 'C':
-	  /* Match century number.  */
-	  get_number (0, 99, 2);
-	  century = val;
-	  want_xday = 1;
-	  break;
-	case 'd':
-	case 'e':
-	  /* Match day of month.  */
-	  get_number (1, 31, 2);
-	  tm->tm_mday = val;
-	  have_mday = 1;
-	  want_xday = 1;
-	  break;
-	case 'F':
-	  if (!recursive ("%Y-%m-%d"))
-	    return NULL;
-	  want_xday = 1;
-	  break;
-	case 'x':
-	  /* Fall through.  */
-	case 'D':
-	  /* Match standard day format.  */
-	  if (!recursive (HERE_D_FMT))
-	    return NULL;
-	  want_xday = 1;
-	  break;
-	case 'k':
-	case 'H':
-	  /* Match hour in 24-hour clock.  */
-	  get_number (0, 24, 2);  /* allow 24:00:00 */
-	  tm->tm_hour = val;
-	  have_I = 0;
-	  break;
-	case 'l':
-	  /* Match hour in 12-hour clock.  GNU extension.  */
-	case 'I':
-	  /* Match hour in 12-hour clock.  */
-	  get_number (1, 12, 2);
-	  tm->tm_hour = val % 12;
-	  have_I = 1;
-	  break;
-	case 'j':
-	  /* Match day number of year.  */
-	  get_number (1, 366, 3);
-	  tm->tm_yday = val - 1;
-	  have_yday = 1;
-	  break;
-	case 'm':
-	  /* Match number of month.  */
-	  get_number (1, 12, 2);
-	  tm->tm_mon = val - 1;
-	  have_mon = 1;
-	  want_xday = 1;
-	  break;
-	case 'M':
-	  /* Match minute.  */
-	  get_number (0, 59, 2);
-	  tm->tm_min = val;
-	  break;
-	case 'n':
-	case 't':
-	  /* Match any white space.  */
-	  while (isspace ((int)*rp))
-	    ++rp;
-	  break;
-	case 'p':
-	  /* Match locale's equivalent of AM/PM.  */
-	  if(!locale_strings_set) get_locale_strings();
-	  if (!match_string (am_pm[0], rp)) {
-	    if (match_string (am_pm[1], rp))
-	      is_pm = 1;
-	    else
-		return NULL;
-	  }
-	  break;
-	case 'r':
-	  if (!recursive (HERE_T_FMT_AMPM))
-	    return NULL;
-	  break;
-	case 'R':
-	    if (!recursive ("%H:%M"))
-		return NULL;
-	    break;
-	case 's':
-	{
-	    /* The number of seconds may be very high so we cannot use
-	       the `get_number' macro.  Instead read the number
-	       character for character and construct the result while
-	       doing this.  */
-	    time_t secs = 0;
-	    if (*rp < '0' || *rp > '9')
-		/* We need at least one digit.  */
-		return NULL;
-
-	    do
-	    {
-		secs *= 10;
-		secs += *rp++ - '0';
-	    }
-	    while (*rp >= '0' && *rp <= '9');
-
-#ifdef HAVE_LOCALTIME_R
-	    if ((tm = localtime_r (&secs, tm)) == NULL) return NULL;
-#else
-	    if ((tm = localtime (&secs)) == NULL) return NULL;
-#endif
-	}
-	break;
-	case 'S':
-	    get_number (0, 61, 2);
-	    tm->tm_sec = val;
-	    break;
-	case 'X':
-	    /* Fall through.  */
-	case 'T':
-	    if (!recursive (HERE_T_FMT))
-		return NULL;
-	    break;
-	case 'u':
-	    get_number (1, 7, 1);
-	    tm->tm_wday = val % 7;
-	    have_wday = 1;
-	    break;
-	case 'g':
-	    get_number (0, 99, 2);
-	    /* XXX This cannot determine any field in TM.  */
-	    break;
-	case 'G':
-	    if (*rp < '0' || *rp > '9')
-		return NULL;
-	    /* XXX Ignore the number since we would need some more
-	       information to compute a real date.  */
-	    do
-		++rp;
-	    while (*rp >= '0' && *rp <= '9');
-	    break;
-	case 'U':
-	  get_number (0, 53, 2);
-	  week_no = val;
-	  have_uweek = 1;
-	  break;
-	case 'W':
-	  get_number (0, 53, 2);
-	  week_no = val;
-	  have_wweek = 1;
-	  break;
-	case 'V':
-	    get_number (0, 53, 2);
-	    /* XXX This cannot determine any field in TM without some
-	       information.  */
-	    break;
-	case 'w':
-	    /* Match number of weekday.  */
-	    get_number (0, 6, 1);
-	    tm->tm_wday = val;
-	    have_wday = 1;
-	    break;
-	case 'y':
-	    /* Match year within century.  */
-	    get_number (0, 99, 2);
-	    /* The "Year 2000: The Millennium Rollover" paper suggests that
-	       values in the range 69-99 refer to the twentieth century.
-	       And this is mandated by the POSIX 2001 standard, with a
-	       caveat that it might change in future.
-	    */
-	    int ival = val;
-	    tm->tm_year = ival >= 69 ? ival : ival + 100;
-	    /* Indicate that we want to use the century, if specified.  */
-	    want_century = 1;
-	    want_xday = 1;
-	    break;
-	case 'Y':
-	    /* Match year including century number.  */
-	    get_number (0, 9999, 4);
-	    tm->tm_year = val - 1900;
-	    want_century = 0;
-	    want_xday = 1;
-	    break;
-	case 'z':
-	    /* Only recognize RFC 822 form */
-	    {
-		int n = 0, neg, off = 0;
-		val = 0;
-		while (*rp == ' ') ++rp;
-		if (*rp != '+' && *rp != '-') return NULL;
-		neg = *rp++ == '-';
-		while (n < 4 && *rp >= '0' && *rp <= '9') {
-		    val = val * 10 + *rp++ - '0';
-		    ++n;
-		}
-		if (n != 4) return NULL;
-		else {
-		    /* We have to convert the minutes into decimal.  */
-		    if (val % 100 >= 60) return NULL;
-		    val = (val / 100) * 100 + ((val % 100) * 50) / 30;
-		}
-		if (val > 1200) return NULL;
-		off = (val * 3600) / 100;
-		if (neg) off = -off;
-		*poffset = off;
-	    }
-	    break;
-	case 'Z':
-            // start DV changes
-	    // error(_("use of %s for input is not supported"), "%Z");
-	    error("use of %s for input is not supported", "%Z");
-	    // stop DV changes
-	    return NULL;
-	    break;
-	case 'E':
-	    /* We have no information about the era format.  Just use
-	       the normal format.  */
-	    if (*fmt != 'c' && *fmt != 'C' && *fmt != 'y' && *fmt != 'Y'
-		&& *fmt != 'x' && *fmt != 'X')
-		/* This is an illegal format.  */
-		return NULL;
-
-	    goto start_over;
-	case 'O':
-	    switch (*fmt++)
-	    {
-	    case 'd':
-	    case 'e':
-		/* Match day of month using alternate numeric symbols.  */
-		get_alt_number (1, 31, 2);
-		tm->tm_mday = val;
-		have_mday = 1;
-		want_xday = 1;
-		break;
-	    case 'H':
-		/* Match hour in 24-hour clock using alternate numeric
-		   symbols.  */
-		get_alt_number (0, 23, 2);
-		tm->tm_hour = val;
-		have_I = 0;
-		break;
-	    case 'I':
-		/* Match hour in 12-hour clock using alternate numeric
-		   symbols.  */
-		get_alt_number (1, 12, 2);
-		tm->tm_hour = val % 12;
-		have_I = 1;
-		break;
-	    case 'm':
-		/* Match month using alternate numeric symbols.  */
-		get_alt_number (1, 12, 2);
-		tm->tm_mon = val - 1;
-		have_mon = 1;
-		want_xday = 1;
-		break;
-	    case 'M':
-		/* Match minutes using alternate numeric symbols.  */
-		get_alt_number (0, 59, 2);
-		tm->tm_min = val;
-		break;
-	    case 'S':
-		/* Match seconds using alternate numeric symbols.
-		   get_alt_number (0, 61, 2); */
-		   {
-		       double sval;
-		       char *end;
-		       sval = strtod(rp, &end);
-		       if( sval >= 0.0 && sval <= 61.0) {
-			   tm->tm_sec = (int) sval;
-			   *psecs = sval;
-		       }
-		       rp = end;
-		   }
-		break;
-	    case 'U':
-	      get_alt_number (0, 53, 2);
-	      week_no = val;
-	      have_uweek = 1;
-	      break;
-	    case 'W':
-	      get_alt_number (0, 53, 2);
-	      week_no = val;
-	      have_wweek = 1;
-	      break;
-	    case 'V':
-		get_alt_number (0, 53, 2);
-		/* XXX This cannot determine any field in TM without
-		   further information.  */
-		break;
-	    case 'w':
-		/* Match number of weekday using alternate numeric symbols.  */
-		get_alt_number (0, 6, 1);
-		tm->tm_wday = val;
-		have_wday = 1;
-		break;
-	    case 'y':
-		/* Match year within century using alternate numeric symbols.  */
-		get_alt_number (0, 99, 2);
-		int ival = val;
-		tm->tm_year = ival >= 69 ? ival : ival + 100;
-		want_xday = 1;
-		break;
-	    default:
-		return NULL;
-	    }
-	    break;
-	default:
-	    return NULL;
-	}
-    }
-
-    if (have_I && is_pm)
-	tm->tm_hour += 12;
-
-    if (century != -1)
-    {
-	if (want_century)
-	    tm->tm_year = tm->tm_year % 100 + (century - 19) * 100;
-	else
-	    /* Only the century, but not the year.  Strange, but so be it.  */
-	    tm->tm_year = (century - 19) * 100;
-    }
-
-    if (want_xday && !have_wday) {
-	if ( !(have_mon && have_mday) && have_yday)  {
-	    /* We don't have tm_mon and/or tm_mday, compute them. */
-	    int t_mon = 0;
-	    while (__mon_yday[__isleap(1900 + tm->tm_year)][t_mon] <= tm->tm_yday)
-		t_mon++;
-	    if (!have_mon)
-		tm->tm_mon = t_mon - 1;
-	    if (!have_mday)
-		tm->tm_mday = (tm->tm_yday - __mon_yday[__isleap(1900 + tm->tm_year)][t_mon - 1] + 1);
-	}
-	day_of_the_week (tm);
-    }
-
-    if (want_xday && !have_yday)
-	day_of_the_year (tm);
-
-  if ((have_uweek || have_wweek) && have_wday) {
-      int save_wday = tm->tm_wday;
-      int save_mday = tm->tm_mday;
-      int save_mon = tm->tm_mon;
-      int w_offset = have_uweek ? 0 : 1;
-
-      tm->tm_mday = 1;
-      tm->tm_mon = 0;
-      day_of_the_week (tm);
-      if (have_mday)
-	  tm->tm_mday = save_mday;
-      if (have_mon)
-	  tm->tm_mon = save_mon;
-
-      if (!have_yday)
-	  tm->tm_yday = ((7 - (tm->tm_wday - w_offset)) % 7
-			 + (week_no - 1) *7
-			 + save_wday - w_offset);
-
-      if (!have_mday || !have_mon)
-      {
-	  int t_mon = 0;
-	  while (__mon_yday[__isleap(1900 + tm->tm_year)][t_mon]
-		 <= tm->tm_yday)
-	      t_mon++;
-	  if (!have_mon)
-	      tm->tm_mon = t_mon - 1;
-	  if (!have_mday)
-	      tm->tm_mday =
-		  (tm->tm_yday
-		   - __mon_yday[__isleap(1900 + tm->tm_year)][t_mon - 1] + 1);
-      }
-
-      tm->tm_wday = save_wday;
-  }
-
-    return (char *) rp;
-}
+// start DV changes
+// (avoid unused function warnings because R_strptime is not used)
+//
+// static char *
+// strptime_internal (const char *rp, const char *fmt, stm *tm,
+// 		   double *psecs, int *poffset)
+// {
+//     int cnt;
+//     int val;
+//     int have_I, is_pm;
+//     int century, want_century;
+//     int have_wday, want_xday;
+//     int have_yday;
+//     int have_mon, have_mday;
+//     int have_uweek, have_wweek;
+//     int week_no = 0; /* -Wall */
+//
+//     have_I = is_pm = 0;
+//     century = -1;
+//     want_century = 0;
+//     have_wday = want_xday = have_yday = have_mon = have_mday = 0;
+//     have_uweek = have_wweek = 0;
+//
+//     while (*fmt != '\0')
+//     {
+// 	/* A white space in the format string matches 0 more or white
+// 	   space in the input string.  */
+// 	if (isspace ((int)*fmt))
+// 	{
+// 	    while (isspace ((int)*rp))
+// 		++rp;
+// 	    ++fmt;
+// 	    continue;
+// 	}
+//
+// 	/* Any character but `%' must be matched by the same character
+// 	   in the input string.  */
+// 	if (*fmt != '%')
+// 	{
+// 	    match_char (*fmt++, *rp++);
+// 	    continue;
+// 	}
+//
+// 	++fmt;
+//
+// 	/* We need this for handling the `E' modifier.  */
+//     start_over:
+//
+// 	switch (*fmt++)
+// 	{
+// 	case '%':
+// 	    /* Match the `%' character itself.  */
+// 	    match_char ('%', *rp++);
+// 	    break;
+// 	case 'a':
+// 	case 'A':
+// 	    /* Match day of week.  */
+// 	    if(!locale_strings_set) get_locale_strings();
+// 	    /* try full name first */
+// 	    for (cnt = 0; cnt < 7; ++cnt)
+// 		if  (match_string (weekday_name[cnt], rp)) break;
+// 	    if (cnt == 7) {
+// 		for (cnt = 0; cnt < 7; ++cnt)
+// 		    if (match_string (ab_weekday_name[cnt], rp)) break;
+// 	    }
+// 	    if (cnt == 7)
+// 		/* Does not match a weekday name.  */
+// 		return NULL;
+// 	    tm->tm_wday = cnt;
+// 	    have_wday = 1;
+// 	    break;
+// 	case 'b':
+// 	case 'B':
+// 	case 'h':
+// 	    /* Match month name.  */
+// 	    if(!locale_strings_set) get_locale_strings();
+// 	    /* try full name first */
+// 	    for (cnt = 0; cnt < 12; ++cnt)
+// 		if (match_string (month_name[cnt], rp)) break;
+// 	    if (cnt == 12) {
+// 		/* Try full names */
+// 		for (cnt = 0; cnt < 12; ++cnt)
+// 		    if (match_string (ab_month_name[cnt], rp)) break;
+// 	    }
+// 	    if (cnt == 12)
+// 		/* Does not match a month name.  */
+// 		return NULL;
+// 	    tm->tm_mon = cnt;
+// 	    want_xday = 1;
+// 	    break;
+// 	case 'c':
+// 	    /* Match locale's date and time format.  */
+// 	    if (!recursive (HERE_D_T_FMT))
+// 		return NULL;
+// 	    break;
+// 	case 'C':
+// 	  /* Match century number.  */
+// 	  get_number (0, 99, 2);
+// 	  century = val;
+// 	  want_xday = 1;
+// 	  break;
+// 	case 'd':
+// 	case 'e':
+// 	  /* Match day of month.  */
+// 	  get_number (1, 31, 2);
+// 	  tm->tm_mday = val;
+// 	  have_mday = 1;
+// 	  want_xday = 1;
+// 	  break;
+// 	case 'F':
+// 	  if (!recursive ("%Y-%m-%d"))
+// 	    return NULL;
+// 	  want_xday = 1;
+// 	  break;
+// 	case 'x':
+// 	  /* Fall through.  */
+// 	case 'D':
+// 	  /* Match standard day format.  */
+// 	  if (!recursive (HERE_D_FMT))
+// 	    return NULL;
+// 	  want_xday = 1;
+// 	  break;
+// 	case 'k':
+// 	case 'H':
+// 	  /* Match hour in 24-hour clock.  */
+// 	  get_number (0, 24, 2);  /* allow 24:00:00 */
+// 	  tm->tm_hour = val;
+// 	  have_I = 0;
+// 	  break;
+// 	case 'l':
+// 	  /* Match hour in 12-hour clock.  GNU extension.  */
+// 	case 'I':
+// 	  /* Match hour in 12-hour clock.  */
+// 	  get_number (1, 12, 2);
+// 	  tm->tm_hour = val % 12;
+// 	  have_I = 1;
+// 	  break;
+// 	case 'j':
+// 	  /* Match day number of year.  */
+// 	  get_number (1, 366, 3);
+// 	  tm->tm_yday = val - 1;
+// 	  have_yday = 1;
+// 	  break;
+// 	case 'm':
+// 	  /* Match number of month.  */
+// 	  get_number (1, 12, 2);
+// 	  tm->tm_mon = val - 1;
+// 	  have_mon = 1;
+// 	  want_xday = 1;
+// 	  break;
+// 	case 'M':
+// 	  /* Match minute.  */
+// 	  get_number (0, 59, 2);
+// 	  tm->tm_min = val;
+// 	  break;
+// 	case 'n':
+// 	case 't':
+// 	  /* Match any white space.  */
+// 	  while (isspace ((int)*rp))
+// 	    ++rp;
+// 	  break;
+// 	case 'p':
+// 	  /* Match locale's equivalent of AM/PM.  */
+// 	  if(!locale_strings_set) get_locale_strings();
+// 	  if (!match_string (am_pm[0], rp)) {
+// 	    if (match_string (am_pm[1], rp))
+// 	      is_pm = 1;
+// 	    else
+// 		return NULL;
+// 	  }
+// 	  break;
+// 	case 'r':
+// 	  if (!recursive (HERE_T_FMT_AMPM))
+// 	    return NULL;
+// 	  break;
+// 	case 'R':
+// 	    if (!recursive ("%H:%M"))
+// 		return NULL;
+// 	    break;
+// 	case 's':
+// 	{
+// 	    /* The number of seconds may be very high so we cannot use
+// 	       the `get_number' macro.  Instead read the number
+// 	       character for character and construct the result while
+// 	       doing this.  */
+// 	    time_t secs = 0;
+// 	    if (*rp < '0' || *rp > '9')
+// 		/* We need at least one digit.  */
+// 		return NULL;
+//
+// 	    do
+// 	    {
+// 		secs *= 10;
+// 		secs += *rp++ - '0';
+// 	    }
+// 	    while (*rp >= '0' && *rp <= '9');
+//
+// #ifdef HAVE_LOCALTIME_R
+// 	    if ((tm = localtime_r (&secs, tm)) == NULL) return NULL;
+// #else
+// 	    if ((tm = localtime (&secs)) == NULL) return NULL;
+// #endif
+// 	}
+// 	break;
+// 	case 'S':
+// 	    get_number (0, 61, 2);
+// 	    tm->tm_sec = val;
+// 	    break;
+// 	case 'X':
+// 	    /* Fall through.  */
+// 	case 'T':
+// 	    if (!recursive (HERE_T_FMT))
+// 		return NULL;
+// 	    break;
+// 	case 'u':
+// 	    get_number (1, 7, 1);
+// 	    tm->tm_wday = val % 7;
+// 	    have_wday = 1;
+// 	    break;
+// 	case 'g':
+// 	    get_number (0, 99, 2);
+// 	    /* XXX This cannot determine any field in TM.  */
+// 	    break;
+// 	case 'G':
+// 	    if (*rp < '0' || *rp > '9')
+// 		return NULL;
+// 	    /* XXX Ignore the number since we would need some more
+// 	       information to compute a real date.  */
+// 	    do
+// 		++rp;
+// 	    while (*rp >= '0' && *rp <= '9');
+// 	    break;
+// 	case 'U':
+// 	  get_number (0, 53, 2);
+// 	  week_no = val;
+// 	  have_uweek = 1;
+// 	  break;
+// 	case 'W':
+// 	  get_number (0, 53, 2);
+// 	  week_no = val;
+// 	  have_wweek = 1;
+// 	  break;
+// 	case 'V':
+// 	    get_number (0, 53, 2);
+// 	    /* XXX This cannot determine any field in TM without some
+// 	       information.  */
+// 	    break;
+// 	case 'w':
+// 	    /* Match number of weekday.  */
+// 	    get_number (0, 6, 1);
+// 	    tm->tm_wday = val;
+// 	    have_wday = 1;
+// 	    break;
+// 	case 'y':
+// 	    /* Match year within century.  */
+// 	    get_number (0, 99, 2);
+// 	    /* The "Year 2000: The Millennium Rollover" paper suggests that
+// 	       values in the range 69-99 refer to the twentieth century.
+// 	       And this is mandated by the POSIX 2001 standard, with a
+// 	       caveat that it might change in future.
+// 	    */
+// 	    int ival = val;
+// 	    tm->tm_year = ival >= 69 ? ival : ival + 100;
+// 	    /* Indicate that we want to use the century, if specified.  */
+// 	    want_century = 1;
+// 	    want_xday = 1;
+// 	    break;
+// 	case 'Y':
+// 	    /* Match year including century number.  */
+// 	    get_number (0, 9999, 4);
+// 	    tm->tm_year = val - 1900;
+// 	    want_century = 0;
+// 	    want_xday = 1;
+// 	    break;
+// 	case 'z':
+// 	    /* Only recognize RFC 822 form */
+// 	    {
+// 		int n = 0, neg, off = 0;
+// 		val = 0;
+// 		while (*rp == ' ') ++rp;
+// 		if (*rp != '+' && *rp != '-') return NULL;
+// 		neg = *rp++ == '-';
+// 		while (n < 4 && *rp >= '0' && *rp <= '9') {
+// 		    val = val * 10 + *rp++ - '0';
+// 		    ++n;
+// 		}
+// 		if (n != 4) return NULL;
+// 		else {
+// 		    /* We have to convert the minutes into decimal.  */
+// 		    if (val % 100 >= 60) return NULL;
+// 		    val = (val / 100) * 100 + ((val % 100) * 50) / 30;
+// 		}
+// 		if (val > 1200) return NULL;
+// 		off = (val * 3600) / 100;
+// 		if (neg) off = -off;
+// 		*poffset = off;
+// 	    }
+// 	    break;
+// 	case 'Z':
+//             // start DV changes
+// 	    // error(_("use of %s for input is not supported"), "%Z");
+// 	    error("use of %s for input is not supported", "%Z");
+// 	    // stop DV changes
+// 	    return NULL;
+// 	    break;
+// 	case 'E':
+// 	    /* We have no information about the era format.  Just use
+// 	       the normal format.  */
+// 	    if (*fmt != 'c' && *fmt != 'C' && *fmt != 'y' && *fmt != 'Y'
+// 		&& *fmt != 'x' && *fmt != 'X')
+// 		/* This is an illegal format.  */
+// 		return NULL;
+//
+// 	    goto start_over;
+// 	case 'O':
+// 	    switch (*fmt++)
+// 	    {
+// 	    case 'd':
+// 	    case 'e':
+// 		/* Match day of month using alternate numeric symbols.  */
+// 		get_alt_number (1, 31, 2);
+// 		tm->tm_mday = val;
+// 		have_mday = 1;
+// 		want_xday = 1;
+// 		break;
+// 	    case 'H':
+// 		/* Match hour in 24-hour clock using alternate numeric
+// 		   symbols.  */
+// 		get_alt_number (0, 23, 2);
+// 		tm->tm_hour = val;
+// 		have_I = 0;
+// 		break;
+// 	    case 'I':
+// 		/* Match hour in 12-hour clock using alternate numeric
+// 		   symbols.  */
+// 		get_alt_number (1, 12, 2);
+// 		tm->tm_hour = val % 12;
+// 		have_I = 1;
+// 		break;
+// 	    case 'm':
+// 		/* Match month using alternate numeric symbols.  */
+// 		get_alt_number (1, 12, 2);
+// 		tm->tm_mon = val - 1;
+// 		have_mon = 1;
+// 		want_xday = 1;
+// 		break;
+// 	    case 'M':
+// 		/* Match minutes using alternate numeric symbols.  */
+// 		get_alt_number (0, 59, 2);
+// 		tm->tm_min = val;
+// 		break;
+// 	    case 'S':
+// 		/* Match seconds using alternate numeric symbols.
+// 		   get_alt_number (0, 61, 2); */
+// 		   {
+// 		       double sval;
+// 		       char *end;
+// 		       sval = strtod(rp, &end);
+// 		       if( sval >= 0.0 && sval <= 61.0) {
+// 			   tm->tm_sec = (int) sval;
+// 			   *psecs = sval;
+// 		       }
+// 		       rp = end;
+// 		   }
+// 		break;
+// 	    case 'U':
+// 	      get_alt_number (0, 53, 2);
+// 	      week_no = val;
+// 	      have_uweek = 1;
+// 	      break;
+// 	    case 'W':
+// 	      get_alt_number (0, 53, 2);
+// 	      week_no = val;
+// 	      have_wweek = 1;
+// 	      break;
+// 	    case 'V':
+// 		get_alt_number (0, 53, 2);
+// 		/* XXX This cannot determine any field in TM without
+// 		   further information.  */
+// 		break;
+// 	    case 'w':
+// 		/* Match number of weekday using alternate numeric symbols.  */
+// 		get_alt_number (0, 6, 1);
+// 		tm->tm_wday = val;
+// 		have_wday = 1;
+// 		break;
+// 	    case 'y':
+// 		/* Match year within century using alternate numeric symbols.  */
+// 		get_alt_number (0, 99, 2);
+// 		int ival = val;
+// 		tm->tm_year = ival >= 69 ? ival : ival + 100;
+// 		want_xday = 1;
+// 		break;
+// 	    default:
+// 		return NULL;
+// 	    }
+// 	    break;
+// 	default:
+// 	    return NULL;
+// 	}
+//     }
+//
+//     if (have_I && is_pm)
+// 	tm->tm_hour += 12;
+//
+//     if (century != -1)
+//     {
+// 	if (want_century)
+// 	    tm->tm_year = tm->tm_year % 100 + (century - 19) * 100;
+// 	else
+// 	    /* Only the century, but not the year.  Strange, but so be it.  */
+// 	    tm->tm_year = (century - 19) * 100;
+//     }
+//
+//     if (want_xday && !have_wday) {
+// 	if ( !(have_mon && have_mday) && have_yday)  {
+// 	    /* We don't have tm_mon and/or tm_mday, compute them. */
+// 	    int t_mon = 0;
+// 	    while (__mon_yday[__isleap(1900 + tm->tm_year)][t_mon] <= tm->tm_yday)
+// 		t_mon++;
+// 	    if (!have_mon)
+// 		tm->tm_mon = t_mon - 1;
+// 	    if (!have_mday)
+// 		tm->tm_mday = (tm->tm_yday - __mon_yday[__isleap(1900 + tm->tm_year)][t_mon - 1] + 1);
+// 	}
+// 	day_of_the_week (tm);
+//     }
+//
+//     if (want_xday && !have_yday)
+// 	day_of_the_year (tm);
+//
+//   if ((have_uweek || have_wweek) && have_wday) {
+//       int save_wday = tm->tm_wday;
+//       int save_mday = tm->tm_mday;
+//       int save_mon = tm->tm_mon;
+//       int w_offset = have_uweek ? 0 : 1;
+//
+//       tm->tm_mday = 1;
+//       tm->tm_mon = 0;
+//       day_of_the_week (tm);
+//       if (have_mday)
+// 	  tm->tm_mday = save_mday;
+//       if (have_mon)
+// 	  tm->tm_mon = save_mon;
+//
+//       if (!have_yday)
+// 	  tm->tm_yday = ((7 - (tm->tm_wday - w_offset)) % 7
+// 			 + (week_no - 1) *7
+// 			 + save_wday - w_offset);
+//
+//       if (!have_mday || !have_mon)
+//       {
+// 	  int t_mon = 0;
+// 	  while (__mon_yday[__isleap(1900 + tm->tm_year)][t_mon]
+// 		 <= tm->tm_yday)
+// 	      t_mon++;
+// 	  if (!have_mon)
+// 	      tm->tm_mon = t_mon - 1;
+// 	  if (!have_mday)
+// 	      tm->tm_mday =
+// 		  (tm->tm_yday
+// 		   - __mon_yday[__isleap(1900 + tm->tm_year)][t_mon - 1] + 1);
+//       }
+//
+//       tm->tm_wday = save_wday;
+//   }
+//
+//     return (char *) rp;
+// }
+//
+// stop DV changes
 
 /*
   We could use nl_langinfo() here: see src/extra/timezone/strftime.c
