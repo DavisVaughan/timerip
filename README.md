@@ -7,6 +7,10 @@
 
 [![R build
 status](https://github.com/DavisVaughan/timewarp/workflows/R-CMD-check/badge.svg)](https://github.com/DavisVaughan/timewarp)
+[![Travis build
+status](https://travis-ci.org/DavisVaughan/timewarp.svg?branch=master)](https://travis-ci.org/DavisVaughan/timewarp)
+[![Codecov test
+coverage](https://codecov.io/gh/DavisVaughan/timewarp/branch/master/graph/badge.svg)](https://codecov.io/gh/DavisVaughan/timewarp?branch=master)
 <!-- badges: end -->
 
 The goal of timewarp is to be a fast extractor of individual date-time
