@@ -71,3 +71,81 @@ bench::mark(
 #> 1 rip_year(y)                  4.92ms   5.83ms     162.    790.7KB     2.08
 #> 2 as.POSIXlt(y)$year + 1900L  17.82ms  19.45ms      50.9    9.16MB    12.7
 ```
+
+## C API
+
+There is also a C API that mirrors the R API exactly. To use it, there
+are a few steps.
+
+First, add timerip to both Imports and LinkingTo in your Description
+file:
+
+    Imports:
+        timerip
+    LinkingTo:
+        timerip
+
+Next, add an `.onLoad()` R function for your package with the following
+in it, we’ll assume your package is named “mypackage”.
+
+    .onLoad <- function(libname, pkgname) {
+      # Load timerip namespace for access to C callables
+      requireNamespace("timerip", quietly = TRUE)
+    
+      # Initialize timerip API
+      .Call(mypackage_init_timerip)
+    }
+
+This ensures that the timerip namespace is available so you have access
+to the C callables that are exported from it, and then calls a package
+initialization function that is going to initialize the timerip C
+callables by calling `timerip_init_api()`. We haven’t created that
+function yet, let’s do it now.
+
+Add a `mypackage-timerip.c` file with the following:
+
+    #include <timerip.c>
+    
+    SEXP mypackage_init_timerip() {
+      timerip_init_api();
+      return R_NilValue;
+    }
+
+In your `init.c` file, add an entry for `mypackage_init_timerip()`. It
+should look something like this:
+
+    #include <R.h>
+    #include <Rinternals.h>
+    #include <stdlib.h> // for NULL
+    #include <R_ext/Rdynload.h>
+    
+    /* .Call calls */
+    extern SEXP mypackage_init_timerip();
+    
+    static const R_CallMethodDef CallEntries[] = {
+      {"mypackage_init_timerip", (DL_FUNC) &mypackage_init_timerip, 0},
+      {NULL, NULL, 0}
+    };
+    
+    void R_init_mypackage(DllInfo *dll)
+    {
+      R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+      R_useDynamicSymbols(dll, FALSE);
+    }
+
+If you use roxygen2, you’ll also need to have a roxygen comment in an R
+file that looks like this (if you don’t already).
+
+    #' @useDynLib mypackage, .registration = TRUE
+
+Now when you run `devtools::document()` and then `devtools::load_all()`
+everything should load without issues.
+
+At this point, you can access the timerip API by including `<timerip.h>`
+in your C file:
+
+    #include <timerip.h>
+    
+    SEXP myfunction(SEXP x) {
+      return rip_year(x);
+    }
