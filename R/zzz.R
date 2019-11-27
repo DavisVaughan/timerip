@@ -1,5 +1,5 @@
 # nocov start
 .onLoad <- function(libname, pkgname) {
-  .Call(timewarp_init_library, asNamespace("timewarp"))
+  .Call(timerip_init_library, asNamespace("timerip"))
 }
 # nocov end

@@ -1,4 +1,4 @@
-#include "timewarp.h"
+#include "timerip.h"
 #include "utils.h"
 
 // -----------------------------------------------------------------------------
@@ -10,9 +10,9 @@ static SEXP posixlt_time_wday(SEXP x);
 // [[ register() ]]
 SEXP time_wday(SEXP x) {
   switch (time_class_type(x)) {
-  case timewarp_class_date: return date_time_wday(x);
-  case timewarp_class_posixct: return posixct_time_wday(x);
-  case timewarp_class_posixlt: return posixlt_time_wday(x);
+  case timerip_class_date: return date_time_wday(x);
+  case timerip_class_posixct: return posixct_time_wday(x);
+  case timerip_class_posixlt: return posixlt_time_wday(x);
   default: Rf_errorcall(R_NilValue, "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
@@ -29,7 +29,7 @@ SEXP time_wday(SEXP x) {
     stm tm;                                                      \
     stm* p_tm = &tm;                                             \
                                                                  \
-    double elt = p_x[i] * TIMEWARP_SECONDS_IN_DAY;               \
+    double elt = p_x[i] * TIMERIP_SECONDS_IN_DAY;                \
                                                                  \
     bool valid;                                                  \
                                                                  \

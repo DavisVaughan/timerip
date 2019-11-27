@@ -12,5 +12,5 @@
 #' x <- as.POSIXct("1969-12-31 19:05:00", tz = "America/New_York")
 #' time_minute(x)
 time_minute <- function(x) {
-  .Call(timewarp_minute, x)
+  .Call(timerip_minute, x)
 }

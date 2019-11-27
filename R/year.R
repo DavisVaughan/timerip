@@ -21,5 +21,5 @@
 #' time_year(a)
 #' time_year(b)
 time_year <- function(x) {
-  .Call(timewarp_year, x)
+  .Call(timerip_year, x)
 }

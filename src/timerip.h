@@ -1,5 +1,5 @@
-#ifndef TIMEWARP_H
-#define TIMEWARP_H
+#ifndef TIMERIP_H
+#define TIMERIP_H
 
 // "datetime.h" comes before the R_NO_REMAP
 #include "datetime.h"

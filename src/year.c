@@ -1,4 +1,4 @@
-#include "timewarp.h"
+#include "timerip.h"
 #include "utils.h"
 
 // -----------------------------------------------------------------------------
@@ -10,9 +10,9 @@ static SEXP posixlt_time_year(SEXP x);
 // [[ register() ]]
 SEXP time_year(SEXP x) {
   switch (time_class_type(x)) {
-  case timewarp_class_date: return date_time_year(x);
-  case timewarp_class_posixct: return posixct_time_year(x);
-  case timewarp_class_posixlt: return posixlt_time_year(x);
+  case timerip_class_date: return date_time_year(x);
+  case timerip_class_posixct: return posixct_time_year(x);
+  case timerip_class_posixlt: return posixlt_time_year(x);
   default: Rf_errorcall(R_NilValue, "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
@@ -26,7 +26,7 @@ SEXP time_year(SEXP x) {
     stm tm;                                                    \
     stm* p_tm = &tm;                                           \
                                                                \
-    double elt = p_x[i] * TIMEWARP_SECONDS_IN_DAY;             \
+    double elt = p_x[i] * TIMERIP_SECONDS_IN_DAY;              \
                                                                \
     bool valid;                                                \
                                                                \
@@ -42,7 +42,7 @@ SEXP time_year(SEXP x) {
       continue;                                                \
     }                                                          \
                                                                \
-    p_out[i] = p_tm->tm_year + TIMEWARP_YEAR_OFFSET;           \
+    p_out[i] = p_tm->tm_year + TIMERIP_YEAR_OFFSET;            \
   }                                                            \
 }
 
@@ -89,7 +89,7 @@ static SEXP date_time_year(SEXP x) {
       continue;                                                  \
     }                                                            \
                                                                  \
-    p_out[i] = p_tm->tm_year + TIMEWARP_YEAR_OFFSET;             \
+    p_out[i] = p_tm->tm_year + TIMERIP_YEAR_OFFSET;              \
   }                                                              \
 }
 
@@ -142,7 +142,7 @@ static SEXP posixlt_time_year(SEXP x) {
   R_xlen_t size = Rf_xlength(out);
 
   for (R_xlen_t i = 0; i < size; ++i) {
-    p_out[i] += TIMEWARP_YEAR_OFFSET;
+    p_out[i] += TIMERIP_YEAR_OFFSET;
   }
 
   UNPROTECT(1);

@@ -12,5 +12,5 @@
 #' x <- as.POSIXct("2019-01-01 00:00:05", "UTC")
 #' time_second(x)
 time_second <- function(x) {
-  .Call(timewarp_second, x)
+  .Call(timerip_second, x)
 }

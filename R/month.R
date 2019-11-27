@@ -22,5 +22,5 @@
 #' time_month(a)
 #' time_month(b)
 time_month <- function(x) {
-  .Call(timewarp_month, x)
+  .Call(timerip_month, x)
 }

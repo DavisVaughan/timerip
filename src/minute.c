@@ -1,4 +1,4 @@
-#include "timewarp.h"
+#include "timerip.h"
 #include "utils.h"
 
 // -----------------------------------------------------------------------------
@@ -10,9 +10,9 @@ static SEXP posixlt_time_minute(SEXP x);
 // [[ register() ]]
 SEXP time_minute(SEXP x) {
   switch (time_class_type(x)) {
-  case timewarp_class_date: return date_time_minute(x);
-  case timewarp_class_posixct: return posixct_time_minute(x);
-  case timewarp_class_posixlt: return posixlt_time_minute(x);
+  case timerip_class_date: return date_time_minute(x);
+  case timerip_class_posixct: return posixct_time_minute(x);
+  case timerip_class_posixlt: return posixlt_time_minute(x);
   default: Rf_errorcall(R_NilValue, "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }

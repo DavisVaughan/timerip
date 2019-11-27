@@ -19,5 +19,5 @@
 #' time_mday(x)
 #' time_mday(y)
 time_mday <- function(x) {
-  .Call(timewarp_mday, x)
+  .Call(timerip_mday, x)
 }

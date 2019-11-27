@@ -18,5 +18,5 @@
 #' time_hour(x)
 #' time_hour(y)
 time_hour <- function(x) {
-  .Call(timewarp_hour, x)
+  .Call(timerip_hour, x)
 }

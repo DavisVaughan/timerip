@@ -1,19 +1,19 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# timewarp
+# timerip
 
 <!-- badges: start -->
 
 [![R build
-status](https://github.com/DavisVaughan/timewarp/workflows/R-CMD-check/badge.svg)](https://github.com/DavisVaughan/timewarp)
+status](https://github.com/DavisVaughan/timerip/workflows/R-CMD-check/badge.svg)](https://github.com/DavisVaughan/timerip)
 [![Travis build
-status](https://travis-ci.org/DavisVaughan/timewarp.svg?branch=master)](https://travis-ci.org/DavisVaughan/timewarp)
+status](https://travis-ci.org/DavisVaughan/timerip.svg?branch=master)](https://travis-ci.org/DavisVaughan/timerip)
 [![Codecov test
-coverage](https://codecov.io/gh/DavisVaughan/timewarp/branch/master/graph/badge.svg)](https://codecov.io/gh/DavisVaughan/timewarp?branch=master)
+coverage](https://codecov.io/gh/DavisVaughan/timerip/branch/master/graph/badge.svg)](https://codecov.io/gh/DavisVaughan/timerip?branch=master)
 <!-- badges: end -->
 
-The goal of timewarp is to be a fast extractor of individual date-time
+The goal of timerip is to be a fast extractor of individual date-time
 components, such as year or month, from `Date` or `POSIXct` objects.
 
 ## Installation
@@ -21,7 +21,7 @@ components, such as year or month, from `Date` or `POSIXct` objects.
 You can install the dev version from GitHub with:
 
 ``` r
-devtools::install_github("DavisVaughan/timewarp")
+devtools::install_github("DavisVaughan/timerip")
 ```
 
 ## Example

@@ -1,23 +1,23 @@
-#ifndef TIMEWARP_UTILS_H
-#define TIMEWARP_UTILS_H
+#ifndef TIMERIP_UTILS_H
+#define TIMERIP_UTILS_H
 
-#include "timewarp.h"
-
-// -----------------------------------------------------------------------------
-
-#define TIMEWARP_YEAR_OFFSET 1900
-#define TIMEWARP_SECONDS_IN_DAY 86400
+#include "timerip.h"
 
 // -----------------------------------------------------------------------------
 
-enum timewarp_class_type {
-  timewarp_class_date,
-  timewarp_class_posixct,
-  timewarp_class_posixlt,
-  timewarp_class_unknown
+#define TIMERIP_YEAR_OFFSET 1900
+#define TIMERIP_SECONDS_IN_DAY 86400
+
+// -----------------------------------------------------------------------------
+
+enum timerip_class_type {
+  timerip_class_date,
+  timerip_class_posixct,
+  timerip_class_posixlt,
+  timerip_class_unknown
 };
 
-enum timewarp_class_type time_class_type(SEXP x);
+enum timerip_class_type time_class_type(SEXP x);
 
 // -----------------------------------------------------------------------------
 
