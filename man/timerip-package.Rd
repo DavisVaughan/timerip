@@ -4,9 +4,9 @@
 \name{timerip-package}
 \alias{timerip}
 \alias{timerip-package}
-\title{timerip: Extract Datetime Components}
+\title{timerip: Rip Out Datetime Components}
 \description{
-Extract datetime components easily and efficiently. The R Core
+Rip out datetime components easily and efficiently. The R Core
     group is the original author of the code made available with slight
     modifications by this package.
 }
