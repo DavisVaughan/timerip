@@ -2,28 +2,28 @@
 
 // -----------------------------------------------------------------------------
 
-enum timewarp_class_type time_class_type(SEXP x);
-static enum timewarp_class_type time_class_type_impl(SEXP klass);
-static const char* class_type_as_str(enum timewarp_class_type type);
+enum timerip_class_type time_class_type(SEXP x);
+static enum timerip_class_type time_class_type_impl(SEXP klass);
+static const char* class_type_as_str(enum timerip_class_type type);
 
 // [[ register() ]]
-SEXP timewarp_class_type(SEXP x) {
+SEXP timerip_class_type(SEXP x) {
   return Rf_mkString(class_type_as_str(time_class_type(x)));
 }
 
-enum timewarp_class_type time_class_type(SEXP x) {
+enum timerip_class_type time_class_type(SEXP x) {
   if (!OBJECT(x)) {
-    return timewarp_class_unknown;
+    return timerip_class_unknown;
   }
 
   SEXP klass = PROTECT(Rf_getAttrib(x, R_ClassSymbol));
-  enum timewarp_class_type type = time_class_type_impl(klass);
+  enum timerip_class_type type = time_class_type_impl(klass);
 
   UNPROTECT(1);
   return type;
 }
 
-static enum timewarp_class_type time_class_type_impl(SEXP klass) {
+static enum timerip_class_type time_class_type_impl(SEXP klass) {
   int n = Rf_length(klass);
   SEXP const* p_klass = STRING_PTR(klass);
 
@@ -32,26 +32,26 @@ static enum timewarp_class_type time_class_type_impl(SEXP klass) {
   SEXP last = *p_klass++;
 
   if (last == strings_date) {
-    return timewarp_class_date;
+    return timerip_class_date;
   }
 
   if (last == strings_posixt) {
     if (butlast == strings_posixlt) {
-      return timewarp_class_posixlt;
+      return timerip_class_posixlt;
     } else if (butlast == strings_posixct) {
-      return timewarp_class_posixct;
+      return timerip_class_posixct;
     }
   }
 
-  return timewarp_class_unknown;
+  return timerip_class_unknown;
 }
 
-static const char* class_type_as_str(enum timewarp_class_type type) {
+static const char* class_type_as_str(enum timerip_class_type type) {
   switch (type) {
-  case timewarp_class_date: return "date";
-  case timewarp_class_posixct: return "posixct";
-  case timewarp_class_posixlt: return "posixlt";
-  case timewarp_class_unknown: return "unknown";
+  case timerip_class_date: return "date";
+  case timerip_class_posixct: return "posixct";
+  case timerip_class_posixlt: return "posixlt";
+  case timerip_class_unknown: return "unknown";
   }
   never_reached("class_type_as_str");
 }
@@ -123,7 +123,7 @@ SEXP strings_date = NULL;
 
 // -----------------------------------------------------------------------------
 
-void timewarp_init_utils(SEXP ns) {
+void timerip_init_utils(SEXP ns) {
   // Holds the CHARSXP objects because they can be garbage collected
   strings = Rf_allocVector(STRSXP, 4);
   R_PreserveObject(strings);

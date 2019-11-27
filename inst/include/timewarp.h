@@ -1,11 +1,11 @@
-#ifndef TIMEWARP_H
-#define TIMEWARP_H
+#ifndef TIMERIP_H
+#define TIMERIP_H
 
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>
 
-SEXP (*time_year)(SEXP);
+SEXP (*rip_year)(SEXP);
 
-void timewarp_init_api();
+void timerip_init_api();
 
 #endif

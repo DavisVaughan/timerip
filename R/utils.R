@@ -1,4 +1,4 @@
 # For testing
 time_class_type <- function(x) {
-  .Call(timewarp_class_type, x)
+  .Call(timerip_class_type, x)
 }

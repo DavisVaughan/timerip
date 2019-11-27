@@ -1,7 +1,7 @@
-#include "timewarp.h"
+#include "timerip.h"
 
-SEXP (*time_year)(SEXP) = NULL;
+SEXP (*rip_year)(SEXP) = NULL;
 
-void timewarp_init_api() {
-  time_year = (SEXP (*)(SEXP)) R_GetCCallable("timewarp", "time_year");
+void timerip_init_api() {
+  rip_year = (SEXP (*)(SEXP)) R_GetCCallable("timerip", "rip_year");
 }
