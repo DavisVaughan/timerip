@@ -1,6 +1,6 @@
 #' Extract the minutes from a date or datetime
 #'
-#' `time_minute()` extracts the minutes from a date or datetime object.
+#' `rip_minute()` extracts the minutes from a date or datetime object.
 #'
 #' @param x `<Date / POSIXct / POSIXlt>`
 #'
@@ -10,7 +10,7 @@
 #' @export
 #' @examples
 #' x <- as.POSIXct("1969-12-31 19:05:00", tz = "America/New_York")
-#' time_minute(x)
-time_minute <- function(x) {
+#' rip_minute(x)
+rip_minute <- function(x) {
   .Call(timerip_minute, x)
 }

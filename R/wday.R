@@ -1,6 +1,6 @@
 #' Extract the day of the week from a date or datetime
 #'
-#' `time_mday()` extracts the day of the week from a date or datetime object.
+#' `rip_wday()` extracts the day of the week from a date or datetime object.
 #'
 #' @param x `<Date / POSIXct / POSIXlt>`
 #'
@@ -16,8 +16,8 @@
 #'
 #' identical(as.numeric(x), as.numeric(y))
 #'
-#' time_wday(x)
-#' time_wday(y)
-time_wday <- function(x) {
+#' rip_wday(x)
+#' rip_wday(y)
+rip_wday <- function(x) {
   .Call(timerip_wday, x)
 }

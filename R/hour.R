@@ -1,6 +1,6 @@
 #' Extract the hour from a date or datetime
 #'
-#' `time_hour()` extracts the hour from a date or datetime object.
+#' `rip_hour()` extracts the hour from a date or datetime object.
 #'
 #' @param x `<Date / POSIXct / POSIXlt>`
 #'
@@ -15,8 +15,8 @@
 #'
 #' identical(as.numeric(x), as.numeric(y))
 #'
-#' time_hour(x)
-#' time_hour(y)
-time_hour <- function(x) {
+#' rip_hour(x)
+#' rip_hour(y)
+rip_hour <- function(x) {
   .Call(timerip_hour, x)
 }

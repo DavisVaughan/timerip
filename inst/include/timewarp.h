@@ -4,7 +4,7 @@
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>
 
-SEXP (*time_year)(SEXP);
+SEXP (*rip_year)(SEXP);
 
 void timerip_init_api();
 

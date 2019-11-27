@@ -34,7 +34,7 @@ x <- as.POSIXct("2019-01-01", tz = "EST")
 x <- rep(x, 2e5)
 
 bench::mark(
-  time_year(x),
+  rip_year(x),
   as.POSIXlt(x)$year + 1900L
 )
 ```
@@ -43,7 +43,7 @@ bench::mark(
 #> # A tibble: 2 x 6
 #>   expression                      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr>                 <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 time_year(x)                 5.29ms   6.39ms     153.      2.3MB     2.07
+#> 1 rip_year(x)                  5.29ms   6.39ms     153.      2.3MB     2.07
 #> 2 as.POSIXlt(x)$year + 1900L   12.5ms  15.55ms      63.7    9.92MB    20.3
 ```
 
@@ -53,7 +53,7 @@ Extraction for `Date`s is faster too.
 y <- as.Date(x)
 
 bench::mark(
-  time_year(y),
+  rip_year(y),
   as.POSIXlt(y)$year + 1900L
 )
 ```
@@ -62,6 +62,6 @@ bench::mark(
 #> # A tibble: 2 x 6
 #>   expression                      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr>                 <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 time_year(y)                 4.92ms   5.83ms     162.    790.7KB     2.08
+#> 1 rip_year(y)                  4.92ms   5.83ms     162.    790.7KB     2.08
 #> 2 as.POSIXlt(y)$year + 1900L  17.82ms  19.45ms      50.9    9.16MB    12.7
 ```

@@ -1,6 +1,6 @@
 #' Extract the month from a date or datetime
 #'
-#' `time_month()` extracts the month from a date or datetime object.
+#' `rip_month()` extracts the month from a date or datetime object.
 #'
 #' @param x `<Date / POSIXct / POSIXlt>`
 #'
@@ -11,7 +11,7 @@
 #' @export
 #' @examples
 #' x <- as.Date("2019-01-01")
-#' time_month(x)
+#' rip_month(x)
 #'
 #' # Identical dates, but in different months
 #' a <- as.POSIXct("1969-12-31 19:00:00", tz = "America/New_York")
@@ -19,8 +19,8 @@
 #'
 #' identical(as.numeric(a), as.numeric(b))
 #'
-#' time_month(a)
-#' time_month(b)
-time_month <- function(x) {
+#' rip_month(a)
+#' rip_month(b)
+rip_month <- function(x) {
   .Call(timerip_month, x)
 }

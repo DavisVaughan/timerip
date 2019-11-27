@@ -3,16 +3,16 @@
 
 // -----------------------------------------------------------------------------
 
-static SEXP date_time_wday(SEXP x);
-static SEXP posixct_time_wday(SEXP x);
-static SEXP posixlt_time_wday(SEXP x);
+static SEXP date_rip_wday(SEXP x);
+static SEXP posixct_rip_wday(SEXP x);
+static SEXP posixlt_rip_wday(SEXP x);
 
 // [[ register() ]]
-SEXP time_wday(SEXP x) {
+SEXP rip_wday(SEXP x) {
   switch (time_class_type(x)) {
-  case timerip_class_date: return date_time_wday(x);
-  case timerip_class_posixct: return posixct_time_wday(x);
-  case timerip_class_posixlt: return posixlt_time_wday(x);
+  case timerip_class_date: return date_rip_wday(x);
+  case timerip_class_posixct: return posixct_rip_wday(x);
+  case timerip_class_posixlt: return posixlt_rip_wday(x);
   default: Rf_errorcall(R_NilValue, "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
@@ -22,7 +22,7 @@ SEXP time_wday(SEXP x) {
 // After conversation with Hadley, assume that a Date should not be allowed to
 // have fractional pieces, like seconds. Always return 0 or NA.
 
-#define DATE_TIME_WDAY(CTYPE, CONST_DEREF) {                     \
+#define DATE_RIP_WDAY(CTYPE, CONST_DEREF) {                      \
   const CTYPE* p_x = CONST_DEREF(x);                             \
                                                                  \
   for(R_xlen_t i = 0; i < size; i++) {                           \
@@ -49,15 +49,15 @@ SEXP time_wday(SEXP x) {
   }                                                              \
 }
 
-static SEXP date_time_wday(SEXP x) {
+static SEXP date_rip_wday(SEXP x) {
   R_xlen_t size = Rf_xlength(x);
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
   int* p_out = INTEGER(out);
 
   switch (TYPEOF(x)) {
-  case INTSXP: DATE_TIME_WDAY(int, INTEGER_RO); break;
-  case REALSXP: DATE_TIME_WDAY(double, REAL_RO); break;
+  case INTSXP: DATE_RIP_WDAY(int, INTEGER_RO); break;
+  case REALSXP: DATE_RIP_WDAY(double, REAL_RO); break;
   default: Rf_errorcall(R_NilValue, "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 
@@ -65,11 +65,11 @@ static SEXP date_time_wday(SEXP x) {
   return out;
 }
 
-#undef DATE_TIME_WDAY
+#undef DATE_RIP_WDAY
 
 // -----------------------------------------------------------------------------
 
-#define POSIXCT_TIME_WDAY(CTYPE, CONST_DEREF) {        \
+#define POSIXCT_RIP_WDAY(CTYPE, CONST_DEREF) {         \
   const CTYPE* p_x = CONST_DEREF(x);                   \
                                                        \
   for(R_xlen_t i = 0; i < size; i++) {                 \
@@ -96,7 +96,7 @@ static SEXP date_time_wday(SEXP x) {
   }                                                    \
 }
 
-static SEXP posixct_time_wday(SEXP x) {
+static SEXP posixct_rip_wday(SEXP x) {
   R_xlen_t size = Rf_xlength(x);
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
@@ -112,8 +112,8 @@ static SEXP posixct_time_wday(SEXP x) {
   }
 
   switch (TYPEOF(x)) {
-  case INTSXP: POSIXCT_TIME_WDAY(int, INTEGER_RO); break;
-  case REALSXP: POSIXCT_TIME_WDAY(double, REAL_RO); break;
+  case INTSXP: POSIXCT_RIP_WDAY(int, INTEGER_RO); break;
+  case REALSXP: POSIXCT_RIP_WDAY(double, REAL_RO); break;
   default: Rf_errorcall(R_NilValue, "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
   }
 
@@ -125,13 +125,13 @@ static SEXP posixct_time_wday(SEXP x) {
   return out;
 }
 
-#undef POSIXCT_TIME_WDAY
+#undef POSIXCT_RIP_WDAY
 
 // -----------------------------------------------------------------------------
 
 // Rely on the warning in `?as.POSIXlt()` that the components of POSIXlt
 // objects are always in the correct order
-static SEXP posixlt_time_wday(SEXP x) {
+static SEXP posixlt_rip_wday(SEXP x) {
   int pos = 6;
   SEXP out = VECTOR_ELT(x, pos);
 

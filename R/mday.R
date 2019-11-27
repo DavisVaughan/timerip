@@ -1,6 +1,6 @@
 #' Extract the day of the month from a date or datetime
 #'
-#' `time_mday()` extracts the day of the month from a date or datetime object.
+#' `rip_mday()` extracts the day of the month from a date or datetime object.
 #'
 #' @param x `<Date / POSIXct / POSIXlt>`
 #'
@@ -16,8 +16,8 @@
 #'
 #' identical(as.numeric(x), as.numeric(y))
 #'
-#' time_mday(x)
-#' time_mday(y)
-time_mday <- function(x) {
+#' rip_mday(x)
+#' rip_mday(y)
+rip_mday <- function(x) {
   .Call(timerip_mday, x)
 }

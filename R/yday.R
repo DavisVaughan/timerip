@@ -1,6 +1,6 @@
 #' Extract the day of the year from a date or datetime
 #'
-#' `time_mday()` extracts the day of the year from a date or datetime object.
+#' `rip_yday()` extracts the day of the year from a date or datetime object.
 #'
 #' @param x `<Date / POSIXct / POSIXlt>`
 #'
@@ -16,8 +16,8 @@
 #'
 #' identical(as.numeric(x), as.numeric(y))
 #'
-#' time_yday(x)
-#' time_yday(y)
-time_yday <- function(x) {
+#' rip_yday(x)
+#' rip_yday(y)
+rip_yday <- function(x) {
   .Call(timerip_yday, x)
 }

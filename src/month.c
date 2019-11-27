@@ -3,23 +3,23 @@
 
 // -----------------------------------------------------------------------------
 
-static SEXP date_time_month(SEXP x);
-static SEXP posixct_time_month(SEXP x);
-static SEXP posixlt_time_month(SEXP x);
+static SEXP date_rip_month(SEXP x);
+static SEXP posixct_rip_month(SEXP x);
+static SEXP posixlt_rip_month(SEXP x);
 
 // [[ register() ]]
-SEXP time_month(SEXP x) {
+SEXP rip_month(SEXP x) {
   switch (time_class_type(x)) {
-  case timerip_class_date: return date_time_month(x);
-  case timerip_class_posixct: return posixct_time_month(x);
-  case timerip_class_posixlt: return posixlt_time_month(x);
+  case timerip_class_date: return date_rip_month(x);
+  case timerip_class_posixct: return posixct_rip_month(x);
+  case timerip_class_posixlt: return posixlt_rip_month(x);
   default: Rf_errorcall(R_NilValue, "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 // -----------------------------------------------------------------------------
 
-#define DATE_TIME_MONTH(CTYPE, CONST_DEREF) {       \
+#define DATE_RIP_MONTH(CTYPE, CONST_DEREF) {        \
   const CTYPE* p_x = CONST_DEREF(x);                \
                                                     \
   for(R_xlen_t i = 0; i < size; i++) {              \
@@ -46,15 +46,15 @@ SEXP time_month(SEXP x) {
   }                                                 \
 }
 
-static SEXP date_time_month(SEXP x) {
+static SEXP date_rip_month(SEXP x) {
   R_xlen_t size = Rf_xlength(x);
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
   int* p_out = INTEGER(out);
 
   switch (TYPEOF(x)) {
-  case INTSXP: DATE_TIME_MONTH(int, INTEGER_RO); break;
-  case REALSXP: DATE_TIME_MONTH(double, REAL_RO); break;
+  case INTSXP: DATE_RIP_MONTH(int, INTEGER_RO); break;
+  case REALSXP: DATE_RIP_MONTH(double, REAL_RO); break;
   default: Rf_errorcall(R_NilValue, "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 
@@ -62,11 +62,11 @@ static SEXP date_time_month(SEXP x) {
   return out;
 }
 
-#undef DATE_TIME_MONTH
+#undef DATE_RIP_MONTH
 
 // -----------------------------------------------------------------------------
 
-#define POSIXCT_TIME_MONTH(CTYPE, CONST_DEREF) {               \
+#define POSIXCT_RIP_MONTH(CTYPE, CONST_DEREF) {                \
   const CTYPE* p_x = CONST_DEREF(x);                           \
                                                                \
   for(R_xlen_t i = 0; i < size; i++) {                         \
@@ -93,7 +93,7 @@ static SEXP date_time_month(SEXP x) {
   }                                                            \
 }
 
-static SEXP posixct_time_month(SEXP x) {
+static SEXP posixct_rip_month(SEXP x) {
   R_xlen_t size = Rf_xlength(x);
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
@@ -109,8 +109,8 @@ static SEXP posixct_time_month(SEXP x) {
   }
 
   switch (TYPEOF(x)) {
-  case INTSXP: POSIXCT_TIME_MONTH(int, INTEGER_RO); break;
-  case REALSXP: POSIXCT_TIME_MONTH(double, REAL_RO); break;
+  case INTSXP: POSIXCT_RIP_MONTH(int, INTEGER_RO); break;
+  case REALSXP: POSIXCT_RIP_MONTH(double, REAL_RO); break;
   default: Rf_errorcall(R_NilValue, "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
   }
 
@@ -122,13 +122,13 @@ static SEXP posixct_time_month(SEXP x) {
   return out;
 }
 
-#undef POSIXCT_TIME_MONTH
+#undef POSIXCT_RIP_MONTH
 
 // -----------------------------------------------------------------------------
 
 // Rely on the warning in `?as.POSIXlt()` that the components of POSIXlt
 // objects are always in the correct order
-static SEXP posixlt_time_month(SEXP x) {
+static SEXP posixlt_rip_month(SEXP x) {
   int pos = 4;
   SEXP out = VECTOR_ELT(x, pos);
 

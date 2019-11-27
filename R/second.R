@@ -1,6 +1,6 @@
 #' Extract the seconds from a date or datetime
 #'
-#' `time_second()` extracts the seconds from a date or datetime object.
+#' `rip_second()` extracts the seconds from a date or datetime object.
 #'
 #' @param x `<Date / POSIXct / POSIXlt>`
 #'
@@ -10,7 +10,7 @@
 #' @export
 #' @examples
 #' x <- as.POSIXct("2019-01-01 00:00:05", "UTC")
-#' time_second(x)
-time_second <- function(x) {
+#' rip_second(x)
+rip_second <- function(x) {
   .Call(timerip_second, x)
 }
