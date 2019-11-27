@@ -13,6 +13,12 @@ status](https://travis-ci.org/DavisVaughan/timerip.svg?branch=master)](https://t
 coverage](https://codecov.io/gh/DavisVaughan/timerip/branch/master/graph/badge.svg)](https://codecov.io/gh/DavisVaughan/timerip?branch=master)
 <!-- badges: end -->
 
+> In physical cosmology, the Big Rip is a hypothetical cosmological
+> model concerning the ultimate fate of the universe, in which the
+> matter of the universe, from stars and galaxies to atoms and subatomic
+> particles, and even spacetime itself, is progressively torn apart by
+> the expansion of the universe at a certain time in the future.
+
 The goal of timerip is to be a fast extractor of individual date-time
 components, such as year or month, from `Date` or `POSIXct` objects.
 

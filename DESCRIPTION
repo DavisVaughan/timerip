@@ -1,12 +1,12 @@
 Package: timerip
-Title: Extract Datetime Components
+Title: Rip Out Datetime Components
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Davis",
            family = "Vaughan",
            role = c("aut", "cre"),
            email = "davis@rstudio.com")
-Description: Extract datetime components easily and efficiently. The R Core
+Description: Rip out datetime components easily and efficiently. The R Core
     group is the original author of the code made available with slight
     modifications by this package.
 License: GPL-3
