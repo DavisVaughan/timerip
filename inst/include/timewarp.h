@@ -12,6 +12,7 @@ SEXP (*rip_hour)(SEXP);
 SEXP (*rip_mday)(SEXP);
 SEXP (*rip_wday)(SEXP);
 SEXP (*rip_yday)(SEXP);
+SEXP (*rip_info)(SEXP);
 
 void timerip_init_api();
 
