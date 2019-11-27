@@ -4,10 +4,10 @@ SEXP (*rip_year)(SEXP) = NULL;
 SEXP (*rip_month)(SEXP) = NULL;
 SEXP (*rip_second)(SEXP) = NULL;
 SEXP (*rip_minute)(SEXP) = NULL;
-SEXP (*rip_year)(SEXP) = NULL;
-SEXP (*rip_year)(SEXP) = NULL;
-SEXP (*rip_year)(SEXP) = NULL;
-SEXP (*rip_year)(SEXP) = NULL;
+SEXP (*rip_hour)(SEXP) = NULL;
+SEXP (*rip_mday)(SEXP) = NULL;
+SEXP (*rip_wday)(SEXP) = NULL;
+SEXP (*rip_yday)(SEXP) = NULL;
 
 void timerip_init_api() {
   rip_year = (SEXP (*)(SEXP)) R_GetCCallable("timerip", "rip_year");
