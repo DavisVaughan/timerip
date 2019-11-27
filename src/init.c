@@ -37,6 +37,13 @@ void R_init_timerip(DllInfo *dll)
   R_useDynamicSymbols(dll, FALSE);
 
   R_RegisterCCallable("timerip", "rip_year", (DL_FUNC) &rip_year);
+  R_RegisterCCallable("timerip", "rip_month", (DL_FUNC) &rip_month);
+  R_RegisterCCallable("timerip", "rip_second", (DL_FUNC) &rip_second);
+  R_RegisterCCallable("timerip", "rip_minute", (DL_FUNC) &rip_minute);
+  R_RegisterCCallable("timerip", "rip_hour", (DL_FUNC) &rip_hour);
+  R_RegisterCCallable("timerip", "rip_mday", (DL_FUNC) &rip_mday);
+  R_RegisterCCallable("timerip", "rip_wday", (DL_FUNC) &rip_wday);
+  R_RegisterCCallable("timerip", "rip_yday", (DL_FUNC) &rip_yday);
 }
 
 void timerip_init_utils(SEXP ns);
