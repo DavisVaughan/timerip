@@ -112,6 +112,60 @@
 <a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; 1 rip_year(y)                  4.92ms   5.83ms     162.    790.7KB     2.08</span></a>
 <a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; 2 as.POSIXlt(y)$year + 1900L  17.82ms  19.45ms      50.9    9.16MB    12.7</span></a></code></pre></div>
 </div>
+<div id="c-api" class="section level2">
+<h2 class="hasAnchor">
+<a href="#c-api" class="anchor"></a>C API</h2>
+<p>There is also a C API that mirrors the R API exactly. To use it, there are a few steps.</p>
+<p>First, add timerip to both Imports and LinkingTo in your Description file:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">Imports<span class="op">:</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="st">    </span>timerip</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">LinkingTo<span class="op">:</span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="st">    </span>timerip</a></code></pre></div>
+<p>Next, add an <code><a href="https://rdrr.io/r/base/ns-hooks.html">.onLoad()</a></code> R function for your package with the following in it, we’ll assume your package is named “mypackage”.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname) {</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">  <span class="co"># Load timerip namespace for access to C callables</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">  <span class="kw"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span>(<span class="st">"timerip"</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">  <span class="co"># Initialize timerip API</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">  <span class="kw"><a href="https://rdrr.io/r/base/CallExternal.html">.Call</a></span>(mypackage_init_timerip)</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">}</a></code></pre></div>
+<p>This ensures that the timerip namespace is available so you have access to the C callables that are exported from it, and then calls a package initialization function that is going to initialize the timerip C callables by calling <code>timerip_init_api()</code>. We haven’t created that function yet, let’s do it now.</p>
+<p>Add a <code>mypackage-timerip.c</code> file with the following:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co">#include &lt;timerip.c&gt;</span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">SEXP <span class="kw">mypackage_init_timerip</span>() {</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">  <span class="kw">timerip_init_api</span>();</a>
+<a class="sourceLine" id="cb8-5" data-line-number="5">  return R_NilValue;</a>
+<a class="sourceLine" id="cb8-6" data-line-number="6">}</a></code></pre></div>
+<p>In your <code>init.c</code> file, add an entry for <code>mypackage_init_timerip()</code>. It should look something like this:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co">#include &lt;R.h&gt;</span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#include &lt;Rinternals.h&gt;</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#include &lt;stdlib.h&gt; // for NULL</span></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#include &lt;R_ext/Rdynload.h&gt;</span></a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="op">/</span><span class="er">*</span><span class="st"> </span>.Call calls <span class="op">*</span><span class="er">/</span></a>
+<a class="sourceLine" id="cb9-7" data-line-number="7">extern SEXP <span class="kw">mypackage_init_timerip</span>();</a>
+<a class="sourceLine" id="cb9-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb9-9" data-line-number="9">static const R_CallMethodDef CallEntries[] =<span class="st"> </span>{</a>
+<a class="sourceLine" id="cb9-10" data-line-number="10">  {<span class="st">"mypackage_init_timerip"</span>, (DL_FUNC) <span class="op">&amp;</span>mypackage_init_timerip, <span class="dv">0</span>},</a>
+<a class="sourceLine" id="cb9-11" data-line-number="11">  {<span class="ot">NULL</span>, <span class="ot">NULL</span>, <span class="dv">0</span>}</a>
+<a class="sourceLine" id="cb9-12" data-line-number="12">};</a>
+<a class="sourceLine" id="cb9-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb9-14" data-line-number="14">void <span class="kw">R_init_mypackage</span>(DllInfo <span class="op">*</span>dll)</a>
+<a class="sourceLine" id="cb9-15" data-line-number="15">{</a>
+<a class="sourceLine" id="cb9-16" data-line-number="16">  <span class="kw">R_registerRoutines</span>(dll, <span class="ot">NULL</span>, CallEntries, <span class="ot">NULL</span>, <span class="ot">NULL</span>);</a>
+<a class="sourceLine" id="cb9-17" data-line-number="17">  <span class="kw">R_useDynamicSymbols</span>(dll, <span class="ot">FALSE</span>);</a>
+<a class="sourceLine" id="cb9-18" data-line-number="18">}</a></code></pre></div>
+<p>If you use roxygen2, you’ll also need to have a roxygen comment in an R file that looks like this (if you don’t already).</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co">#' @useDynLib mypackage, .registration = TRUE</span></a></code></pre></div>
+<p>Now when you run <code>devtools::document()</code> and then <code>devtools::load_all()</code> everything should load without issues.</p>
+<p>At this point, you can access the timerip API by including <code>&lt;timerip.h&gt;</code> in your C file:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="co">#include &lt;timerip.h&gt;</span></a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb11-3" data-line-number="3">SEXP <span class="kw">myfunction</span>(SEXP x) {</a>
+<a class="sourceLine" id="cb11-4" data-line-number="4">  return <span class="kw"><a href="reference/rip_year.html">rip_year</a></span>(x);</a>
+<a class="sourceLine" id="cb11-5" data-line-number="5">}</a></code></pre></div>
+</div>
 </div>
   </div>
 
