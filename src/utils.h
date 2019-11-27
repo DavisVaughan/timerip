@@ -38,4 +38,13 @@ extern SEXP strings_posixct;
 extern SEXP strings_posixt;
 extern SEXP strings_date;
 
+extern SEXP strings_second;
+extern SEXP strings_minute;
+extern SEXP strings_hour;
+extern SEXP strings_mday;
+extern SEXP strings_month;
+extern SEXP strings_year;
+extern SEXP strings_wday;
+extern SEXP strings_yday;
+
 #endif

@@ -116,16 +116,26 @@ int tz_needs_system_env_set(const char* tz, bool utc) {
 // -----------------------------------------------------------------------------
 
 SEXP strings = NULL;
+
 SEXP strings_posixlt = NULL;
 SEXP strings_posixct = NULL;
 SEXP strings_posixt = NULL;
 SEXP strings_date = NULL;
 
+SEXP strings_second = NULL;
+SEXP strings_minute = NULL;
+SEXP strings_hour = NULL;
+SEXP strings_mday = NULL;
+SEXP strings_month = NULL;
+SEXP strings_year = NULL;
+SEXP strings_wday = NULL;
+SEXP strings_yday = NULL;
+
 // -----------------------------------------------------------------------------
 
 void timerip_init_utils(SEXP ns) {
   // Holds the CHARSXP objects because they can be garbage collected
-  strings = Rf_allocVector(STRSXP, 4);
+  strings = Rf_allocVector(STRSXP, 12);
   R_PreserveObject(strings);
 
   strings_posixlt = Rf_mkChar("POSIXlt");
@@ -139,4 +149,28 @@ void timerip_init_utils(SEXP ns) {
 
   strings_date = Rf_mkChar("Date");
   SET_STRING_ELT(strings, 3, strings_date);
+
+  strings_second = Rf_mkChar("second");
+  SET_STRING_ELT(strings, 4, strings_second);
+
+  strings_minute = Rf_mkChar("minute");
+  SET_STRING_ELT(strings, 5, strings_minute);
+
+  strings_hour = Rf_mkChar("hour");
+  SET_STRING_ELT(strings, 6, strings_hour);
+
+  strings_mday = Rf_mkChar("mday");
+  SET_STRING_ELT(strings, 7, strings_mday);
+
+  strings_month = Rf_mkChar("month");
+  SET_STRING_ELT(strings, 8, strings_month);
+
+  strings_year = Rf_mkChar("year");
+  SET_STRING_ELT(strings, 9, strings_year);
+
+  strings_wday = Rf_mkChar("wday");
+  SET_STRING_ELT(strings, 10, strings_wday);
+
+  strings_yday = Rf_mkChar("yday");
+  SET_STRING_ELT(strings, 11, strings_yday);
 }

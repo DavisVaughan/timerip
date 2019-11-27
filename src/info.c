@@ -22,14 +22,14 @@ SEXP rip_info(SEXP x) {
 static void set_info_names(SEXP x) {
   SEXP names = PROTECT(Rf_allocVector(STRSXP, 8));
 
-  SET_STRING_ELT(names, 0, Rf_mkChar("second"));
-  SET_STRING_ELT(names, 1, Rf_mkChar("minute"));
-  SET_STRING_ELT(names, 2, Rf_mkChar("hour"));
-  SET_STRING_ELT(names, 3, Rf_mkChar("mday"));
-  SET_STRING_ELT(names, 4, Rf_mkChar("month"));
-  SET_STRING_ELT(names, 5, Rf_mkChar("year"));
-  SET_STRING_ELT(names, 6, Rf_mkChar("wday"));
-  SET_STRING_ELT(names, 7, Rf_mkChar("yday"));
+  SET_STRING_ELT(names, 0, strings_second);
+  SET_STRING_ELT(names, 1, strings_minute);
+  SET_STRING_ELT(names, 2, strings_hour);
+  SET_STRING_ELT(names, 3, strings_mday);
+  SET_STRING_ELT(names, 4, strings_month);
+  SET_STRING_ELT(names, 5, strings_year);
+  SET_STRING_ELT(names, 6, strings_wday);
+  SET_STRING_ELT(names, 7, strings_yday);
 
   Rf_setAttrib(x, R_NamesSymbol, names);
 
