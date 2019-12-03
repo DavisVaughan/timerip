@@ -99,6 +99,16 @@ known OS with 64-bit time_t and complete tables is Linux.
 
 // Always define to ensure `n_leapseconds` is set
 #define HAVE_POSIX_LEAPSECONDS
+
+// Always define HAVE_WORKING_64BIT_MKTIME, which is
+// only actually applicable for linux but makes a huge speed
+// difference
+#define HAVE_WORKING_64BIT_MKTIME
+
+// Always define HAVE_LOCALTIME_R, which is only
+// applicable on linux, but seems to be slightly faster
+// than the path without it
+#define HAVE_LOCALTIME_R
 // stop DV changes
 
 #ifdef USE_INTERNAL_MKTIME
